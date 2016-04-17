@@ -27,7 +27,6 @@ var config = {
     ],
     module: {
         loaders: [
-            { test: /\.html/, loader: 'html-loader' },
             { test: /\.js/, loader: 'babel-loader', exclude: /node_modules\//, query: {presets: ['es2015', 'react']} },
             { test: /\.scss$/, loaders: ['style-loader', 'css-loader', 'sass-loader'] },
             { test: /\.woff(2)?(\?v=[0-9]\.[0-9]\.[0-9])?$/, loader: "url-loader?limit=10000&minetype=application/font-woff" },
