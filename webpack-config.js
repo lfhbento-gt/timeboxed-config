@@ -7,7 +7,7 @@ var ENV = process.env.NODE_ENV || 'development';
 
 var config = {
     context: __dirname + '/app',
-    entry: ['bootstrap-toggle', 'bootstrap-loader', './js/main.js'],
+    entry: ['bootstrap-loader', './js/main.js'],
     output: {
         path: __dirname + '/dist',
         filename: 'app.js' 
