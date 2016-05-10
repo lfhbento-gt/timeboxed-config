@@ -15,7 +15,12 @@ class RadioButtonGroup extends SelectableComponent {
                                     'btn btn-primary': true,
                                     'active': this.state.selectedItem === key
                                 })}>
-                                    <input type='radio' className={classnames('radio--' + this.props.fieldName)} onChange={this.toggleButton.bind(this)} name={this.props.fieldName} value={key} checked={this.props.selectedItem === key ? 'checked' : 'false'}/>{value}
+                                    <input type='radio'
+                                        className={classnames('radio--' + this.props.fieldName)}
+                                        onChange={this.toggleButton.bind(this)}
+                                        name={this.props.fieldName}
+                                        value={key}
+                                        checked={this.props.selectedItem === key ? 'checked' : 'false'}/>{value}
                                 </label>
                             );
                         }.bind(this))

@@ -1,1 +1,38 @@
-@import 'node_modules/bootstrap-toggle/css/bootstrap-toggle'
+@import 'node_modules/bootstrap-toggle/css/bootstrap-toggle';
+
+html, body {
+    font-size: 12px;
+}
+
+.btn, .form-control {
+    font-size: 12px;
+}
+
+.form-control {
+    height: 28px;
+}
+
+.toggle.btn {
+    min-height: 28px;
+}
+
+.field {
+    display: flex;
+    flex-wrap: nowrap;
+    justify-content: space-between;
+    align-content: center;
+    align-items: center;
+    margin: 6px;
+}
+
+.field--label {
+    display: block;
+    width: 100px;
+}
+
+.field--content {
+    flex-grow: 1;
+    width: 100%;
+    display: flex;
+    justify-content: flex-end;
+}

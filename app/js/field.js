@@ -5,8 +5,8 @@ class Field extends React.Component {
     render() {
         return (
             <div className={classnames('field', 'field--' + this.props.fieldName)}>
-                <label>{this.props.label}</label>
-                {this.props.children}
+                <label className='field--label'>{this.props.label}</label>
+                <div className='field--content'>{this.props.children}</div>
             </div>
         );
     }
