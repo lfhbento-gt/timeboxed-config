@@ -32,6 +32,9 @@ class RadioButtonGroup extends SelectableComponent {
 
     toggleButton(e) {
         this.setState({selectedItem: e.target.value});
+        if (this.props.onChange) {
+            this.props.onChange(e.target.value);
+        }
     }
 }
 

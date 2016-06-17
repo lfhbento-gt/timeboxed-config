@@ -8,9 +8,9 @@ class DropdownField extends SelectableComponent {
             <Field fieldName={this.props.fieldName} label={this.props.label}>
                 <select className="form-control" name={this.props.fieldName} defaultValue={this.state.selectedItem}>
                     {
-                        $.map(this.props.options, function (value, key) {
+                        Object.keys(this.props.options).map((key) => {
                             return (
-                                <option key={key} value={key}>{value}</option>
+                                <option key={key} value={key}>{this.props.options[key]}</option>
                             );
                         })
                     }

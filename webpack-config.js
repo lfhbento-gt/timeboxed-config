@@ -39,7 +39,12 @@ if (ENV === 'production') {
     config = merge(config, {
         devtool: 'source-map',
         plugins: [
-            new webpack.optimize.UglifyJsPlugin({minimize: true})
+            new webpack.DefinePlugin({
+                'process.env':{
+                    'NODE_ENV': JSON.stringify('production')
+                }
+            }),
+            new webpack.optimize.UglifyJsPlugin({minimize: true, compress: {warnings: true}})
         ]
     });
 }

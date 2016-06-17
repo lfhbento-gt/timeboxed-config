@@ -18,7 +18,7 @@ html, body {
 
 .field {
     display: flex;
-    flex-wrap: nowrap;
+    flex-wrap: wrap;
     justify-content: space-between;
     align-content: center;
     align-items: center;
@@ -27,12 +27,85 @@ html, body {
 
 .field--label {
     display: block;
-    width: 100px;
+    width: 120px;
 }
 
 .field--content {
     flex-grow: 1;
-    width: 100%;
     display: flex;
     justify-content: flex-end;
+    height: 32px;
+    align-items: center;
+}
+
+.field--content-inner {
+    width: 100%;
+}
+
+.color-picker {
+    position: relative;
+}
+
+.color-panel {
+    display: flex;
+    justify-content: center;
+    position: static;
+    width: 100%;
+    z-index: 2;
+    top: 32px;
+}
+
+.color-panel--shim {
+    top: 0px;
+    left: 0px;
+    right: 0px;
+    bottom: 0px;
+    position: fixed;
+    z-index: 1;
+}
+
+.color-panel--swatches {
+    z-index: 2;
+    width: 380px;
+    background-color: #FFF;
+}
+
+.color-panel--swatches > div > div > div {
+    box-shadow: none !important;
+}
+
+.color-panel--swatches > div > div > div > div > div {
+    padding: 6px 0px 6px 6px !important;
+    & > div {
+        margin-right: 1px !important;
+        & > div {
+            border-radius: 4px !important;
+            height: 30px !important;
+        }
+    }
+    & > div:nth-child(1) {
+        margin-top: 62px;
+        & > div:nth-child(3) {
+            margin-top: 32px;
+        }
+    }
+    & > div:nth-child(2), & > div:nth-child(5), & > div:nth-child(8) {
+        margin-top: 31px;
+    }
+    & > div:nth-child(9) {
+        margin-top: 93px;
+    }
+}
+
+.swatch {
+    height: 24px;
+    width: 48px;
+    padding: 3px;
+    border: 1px solid #999;
+    border-radius: 4px;
+}
+
+.swatch--color {
+    width: 100%;
+    height: 100%;
 }
