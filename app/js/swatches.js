@@ -55,7 +55,7 @@ class Swatches extends Component {
                 <RadioButtonGroup fieldName='colorType' size='small' options={[
                     {value: '0', label: 'Normal'},
                     {value: '1', label: 'Sunny'},
-                ]} selectedItem={this.state.sunny ? 1 : 0} onChange={this.onColorTypeChange}/>
+                ]} selectedItem={this.state.sunny ? '1' : '0'} onChange={this.onColorTypeChange}/>
                 {
                     (this.state.sunny
                         ? <SwatchRows colors={this.sunlightColors} onColorChange={this.props.onColorChange} />

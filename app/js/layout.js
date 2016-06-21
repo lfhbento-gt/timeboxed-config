@@ -34,14 +34,22 @@ class Layout extends Component {
             dateFormat: '0',
             textAlign: '2',
             font: '0',
-            bgColor: '#000000',
-            fgColor: '#FFFFFF',
             useAdvanced: false,
             weatherProvider: '0',
             useCelsius: false,
             manualLocation: '',
             useKm: false,
             useSleep: true,
+            apiKey: '',
+        };
+
+        let defaultColors = {
+            bgColor: '#000000',
+            fgColor: '#FFFFFF',
+            dateColor: '#FFFFFF',
+            altColor: '#FFFFFF',
+            batteryColor: '#FFFFFF',
+            batteryLowColor: '#FFFFFF',
         };
 
         this.moduleStateKeys = [
@@ -70,10 +78,11 @@ class Layout extends Component {
         this.weatherModules = ['1', '2'];
         this.healthModules = ['3', '4', '5', '6', '7'];
 
-        this.state = Object.assign({}, defaultState, this.props.state);
+        this.state = Object.assign({}, defaultState, defaultColors, this.props.state);
     }
 
     onChange(key, value) {
+        console.log({[key]: value});
         this.setState({[key]: value});
     }
 
@@ -155,7 +164,6 @@ class Layout extends Component {
 
     render() {
         let state = this.state;
-
         return (
             <div>
                 <h1 className='title'>Timeboxed</h1>
@@ -206,6 +214,14 @@ class Layout extends Component {
                     <ColorPicker fieldName='backgroundColor' label='Background color' color={state.bgColor} onChange={this.onChange.bind(this, 'bgColor')} />
                     <ColorPicker fieldName='textColor' label='Foreground color' color={state.fgColor} onChange={this.onChange.bind(this, 'fgColor')} />
                     <ToggleField fieldName='useAdvanced' label='Advanced Colors' checked={state.useAdvanced} onChange={this.onChange.bind(this, 'useAdvanced')} />
+                    {state.useAdvanced ?
+                        <div>
+                            <ColorPicker fieldName='dateColor' label='Date color' color={state.dateColor} onChange={this.onChange.bind(this, 'dateColor')} />
+                            <ColorPicker fieldName='altColor' label='Alternate time color' color={state.altColor} onChange={this.onChange.bind(this, 'altColor')} />
+                            <ColorPicker fieldName='batteryColor' label='Battery color' color={state.batteryColor} onChange={this.onChange.bind(this, 'batteryColor')} />
+                            <ColorPicker fieldName='batteryLowColor' label='Low battery color' color={state.batteryLowColor} onChange={this.onChange.bind(this, 'batteryLowColor')} />
+                        </div>
+                    : null}
                 </OptionGroup>
 
                 {this.isWeatherEnabled() ?

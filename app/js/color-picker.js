@@ -20,8 +20,8 @@ class ColorPicker extends Component {
 
     onColorChange(color) {
         this.setState({color: color});
-        if (this.props.onColorChange) {
-            this.props.onColorChange(color);
+        if (this.props.onChange) {
+            this.props.onChange(color);
         }
         this.hidePanel();
     }
