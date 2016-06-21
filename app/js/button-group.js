@@ -1,39 +1,45 @@
 import React from 'react';
 import Field from './field';
-import { SelectableComponent } from './base-components';
 import classnames from 'classnames';
 
-class RadioButtonGroup extends SelectableComponent {
+class RadioButtonGroup extends React.Component {
+    constructor(props) {
+        super(props);
+        this.state = {selectedItem: (typeof props.selectedItem !== 'undefined' ? props.selectedItem : props.options['0'].value)};
+    }
+
     render() {
         return (
-            <Field fieldName={this.props.fieldName} label={this.props.label}>
-                <div className='btn-group btn-group-justified' data-toggle='buttons'>
+            <Field fieldName={this.props.fieldName} label={this.props.label} labelPosition={this.props.labelPosition}>
+                <div className='btn-group'>
                     {
-                        $.map(this.props.options, function(value, key) {
+                        this.props.options.map((item, index) => {
+                            let classes = {
+                                'btn btn-primary-outline': true,
+                                'active': this.state.selectedItem === item.value
+                            };
+                            if (this.props.size) {
+                                classes[this.props.size] = true;
+                            }
                             return (
-                                <label key={key} className={classnames({
-                                    'btn btn-primary': true,
-                                    'active': this.state.selectedItem === key
-                                })}>
-                                    <input type='radio'
-                                        className={classnames('radio--' + this.props.fieldName)}
-                                        onChange={this.toggleButton.bind(this)}
-                                        name={this.props.fieldName}
-                                        value={key}
-                                        checked={this.props.selectedItem === key ? 'checked' : 'false'}/>{value}
-                                </label>
+                                <button
+                                    key={item.value}
+                                    className={classnames(classes)}
+                                    onClick={this.toggleButton.bind(this, item.value)}>
+                                    {item.label}
+                                </button>
                             );
-                        }.bind(this))
+                        })
                     }
                 </div>
             </Field>
         );
     }
 
-    toggleButton(e) {
-        this.setState({selectedItem: e.target.value});
+    toggleButton(index) {
+        this.setState({selectedItem: index});
         if (this.props.onChange) {
-            this.props.onChange(e.target.value);
+            this.props.onChange(index);
         }
     }
 }

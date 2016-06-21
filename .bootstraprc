@@ -1,4 +1,4 @@
-bootstrapVersion: 3
+bootstrapVersion: 4
 
 useFlexbox: true
 
@@ -8,9 +8,8 @@ styleLoaders:
   - style
   - css
   - sass
+  - postcss
 
 styles: true
 
 scripts: false
-
-appStyles: ./app/css/main.scss

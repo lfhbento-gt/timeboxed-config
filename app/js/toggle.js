@@ -1,26 +1,32 @@
 import React from 'react';
 import Field from './field';
 import classnames from 'classnames';
-import bootstrapToggle from 'bootstrap-toggle';
+import Toggle from 'react-input-toggle/dist/react-input-toggle';
+import 'react-input-toggle/lib/styles/switch.scss';
 
 class ToggleField extends React.Component {
     constructor(props) {
         super(props);
         this.state = {checked: !!props.checked};
+        this.toggleCheckbox = this.toggleCheckbox.bind(this);
     }
 
     render() {
         return (
-            <Field label={this.props.label} fieldName={this.props.fieldName}>
-                <label className='checkbox-inline'>
-                    <input type='checkbox' className={classnames('toggle--' + this.props.fieldName)} value='on' onChange={this.toggleCheckbox.bind(this)} name={this.props.fieldName} checked={this.state.checked} data-toggle='toggle'/>
+            <Field label={this.props.label} fieldName={this.props.fieldName} longLabel={true}>
+                <label>
+                    <Toggle effect='bbounce' onChange={this.toggleCheckbox} checked={this.state.checked}/>
                 </label>
             </Field>
         )
     }
 
     toggleCheckbox(e) {
-        this.setState({checked: !!e.target.checked});
+        let value = !!e.target.checked;
+        this.setState({checked: value});
+        if (this.props.onChange) {
+            this.props.onChange(value);
+        }
     }
 }
 

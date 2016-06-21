@@ -4,7 +4,31 @@ html, body {
     font-size: 12px;
 }
 
-.btn, .form-control {
+.title {
+    margin: 1rem 0;
+    padding: 1rem 0 1.5rem 0;
+    text-align: center;
+    border-bottom: 1px solid #ddd;
+    border-top: 1px solid #ddd;
+    background-color: #f5f5f5;
+    -webkit-box-shadow: 1px 1px 4px 0 #efefef;  /* Safari 3-4, iOS 4.0.2 - 4.2, Android 2.3+ */
+    -moz-box-shadow:    1px 1px 4px 0 #efefef;  /* Firefox 3.5 - 3.6 */
+    box-shadow:         1px 1px 4px 0 #efefef;  /* Opera 10.5, IE 9, Firefox 4+, Chrome 6+, iOS 5 */
+}
+
+.version {
+    font-size: 1rem;
+    color: #999;
+    text-align: center;
+    margin: -2.5rem 0.5rem 2.5rem 0;
+    display: block;
+}
+
+.update {
+    color: #090;
+}
+
+.form-control {
     font-size: 12px;
 }
 
@@ -25,21 +49,90 @@ html, body {
     margin: 6px;
 }
 
-.field--label {
+.field-label {
     display: block;
-    width: 120px;
+    width: 140px;
+    font-weight: bold;
 }
 
-.field--content {
+.field--long-label {
+    .field-label {
+        flex-grow: 1;
+    }
+    .field-content {
+        flex-grow: 0;
+    }
+}
+
+.field--long {
+    flex-direction: column;
+    align-items: stretch;
+    .field-label {
+        width: 100%;
+        padding-right: 4px;
+    }
+}
+
+.field--long-reverse {
+    flex-direction: column-reverse;
+    align-items: stretch;
+    .field-label {
+        width: 100%;
+        padding-right: 4px;
+    }
+    .field-label {
+        margin-top: 4px;
+    }
+}
+
+.field-content {
     flex-grow: 1;
     display: flex;
     justify-content: flex-end;
-    height: 32px;
+    height: 36px;
     align-items: center;
 }
 
-.field--content-inner {
+.field-content-inner {
     width: 100%;
+}
+
+.field-text {
+    display: flex;
+
+    .form-control {
+        height: 32px;
+    }
+}
+
+.field-text--btn {
+    width: 100px;
+    margin-left: 12px;
+}
+
+.field-container {
+    width: 100%;
+}
+
+.side-by-side {
+    display: flex;
+}
+
+.side-by-side--left {
+    flex-grow: 1;
+}
+
+.side-by-side--right {
+    flex-grow: 1;
+    .field-label {
+        text-align: right;
+    }
+}
+
+.helper-text {
+    color: #999;
+    margin-top: -6px;
+    padding: 0 6px;
 }
 
 .color-picker {
@@ -52,7 +145,8 @@ html, body {
     position: static;
     width: 100%;
     z-index: 2;
-    top: 32px;
+    padding-bottom: 6px;
+    margin-top: -12px;
 }
 
 .color-panel--shim {
@@ -67,40 +161,24 @@ html, body {
 .color-panel--swatches {
     z-index: 2;
     width: 380px;
-    background-color: #FFF;
 }
 
-.color-panel--swatches > div > div > div {
-    box-shadow: none !important;
+.color-panel--swatch-item {
+    width: 32px;
+    height: 28px;
+    border-radius: 3px;
+    margin: 1px 1px 0 0;
 }
 
-.color-panel--swatches > div > div > div > div > div {
-    padding: 6px 0px 6px 6px !important;
-    & > div {
-        margin-right: 1px !important;
-        & > div {
-            border-radius: 4px !important;
-            height: 30px !important;
-        }
-    }
-    & > div:nth-child(1) {
-        margin-top: 62px;
-        & > div:nth-child(3) {
-            margin-top: 32px;
-        }
-    }
-    & > div:nth-child(2), & > div:nth-child(5), & > div:nth-child(8) {
-        margin-top: 31px;
-    }
-    & > div:nth-child(9) {
-        margin-top: 93px;
-    }
+.color-panel--swatch-row {
+    display: flex;
+    justify-content: center;
 }
 
 .swatch {
-    height: 24px;
-    width: 48px;
-    padding: 3px;
+    height: 32px;
+    width: 56px;
+    padding: 4px;
     border: 1px solid #999;
     border-radius: 4px;
 }
@@ -108,4 +186,54 @@ html, body {
 .swatch--color {
     width: 100%;
     height: 100%;
+}
+
+.btn-group {
+    display: flex;
+    .btn {
+        flex-grow: 1;
+        width: 10px;
+    }
+}
+
+.rt-toggle__container--bbounce {
+    height: initial;
+    margin: 0;
+    
+    .bbounce__badge {
+        background: #0275d8;
+    }
+    .bbounce__badge--negative {
+        background: #FFF;
+    }
+}
+
+label.rt-toggle {
+    margin-top: 4px;
+}
+
+.card--custom {
+    -webkit-box-shadow: 1px 1px 4px 0 #efefef;  /* Safari 3-4, iOS 4.0.2 - 4.2, Android 2.3+ */
+    -moz-box-shadow:    1px 1px 4px 0 #efefef;  /* Firefox 3.5 - 3.6 */
+    box-shadow:         1px 1px 4px 0 #efefef;  /* Opera 10.5, IE 9, Firefox 4+, Chrome 6+, iOS 5 */
+    margin: 8px;
+    border-radius: 4px;
+}
+
+.card-block--custom {
+    padding: 0 6px 6px 6px;
+}
+
+.card-header {
+    font-size: 1.25rem;
+    padding: 0.5rem 1rem;
+}
+
+label {
+    margin-bottom: initial;
+    display: initial;
+}
+
+.dropdown {
+    height: 32px;
 }

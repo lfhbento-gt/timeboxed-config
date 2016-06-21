@@ -9,8 +9,8 @@ class SelectableComponent extends React.Component {
 }
 
 SelectableComponent.propTypes = {
-    selectedItem: React.PropTypes.string,
-    options: React.PropTypes.object.isRequired,
+    selectedItem: React.PropTypes.number,
+    options: React.PropTypes.arrayOf(React.PropTypes.object).isRequired,
     fieldName: React.PropTypes.string.isRequired,
     label: React.PropTypes.string
 }
