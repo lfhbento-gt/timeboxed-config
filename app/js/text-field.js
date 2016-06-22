@@ -35,7 +35,7 @@ class TextField extends Component {
 
     onButtonClick() {
         if (this.props.onButtonClick) {
-            this.props.onButtonClick();
+            this.props.onButtonClick(this.state.value);
         }
     }
 }

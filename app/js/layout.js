@@ -8,6 +8,9 @@ import ToggleField from './toggle';
 import TextField from './text-field';
 import HelperText from './helper-text';
 import TabContainer from './tabs';
+import VersionIndicator from './version-indicator';
+import Versioned from './versioned.js';
+import ColorPresets from './color-presets';
 
 import 'bootstrap/scss/bootstrap-flex.scss';
 import 'react-select/scss/default.scss';
@@ -50,7 +53,27 @@ class Layout extends Component {
             altColor: '#FFFFFF',
             batteryColor: '#FFFFFF',
             batteryLowColor: '#FFFFFF',
+            bluetoothDisconnected: '#FFFFFF',
+            updateNotification: '#FFFFFF',
+            weatherIcon: '#FFFFFF',
+            curTemp: '#FFFFFF',
+            minTemp: '#FFFFFF',
+            maxTemp: '#FFFFFF',
+            steps: '#FFFFFF',
+            stepsBehind: '#FFFFFF',
+            dist: '#FFFFFF',
+            distBehind: '#FFFFFF',
+            cal: '#FFFFFF',
+            calBehind: '#FFFFFF',
+            sleep: '#FFFFFF',
+            sleepBehind: '#FFFFFF',
+            deep: '#FFFFFF',
+            deepBehind: '#FFFFFF',
+            windDir: '#FFFFFF',
+            windSpeed: '#FFFFFF',
         };
+
+        this.colorKeys = Object.keys(defaultColors);
 
         this.moduleStateKeys = [
             'topLeftModule',
@@ -74,11 +97,13 @@ class Layout extends Component {
             {value: '5', label: 'Calories'},
             {value: '6', label: 'Sleep Time'},
             {value: '7', label: 'Deep Sleep Time'},
+            {value: '8', label: 'Wind dir./speed'},
         ];
-        this.weatherModules = ['1', '2'];
+        this.weatherModules = ['1', '2', '8'];
         this.healthModules = ['3', '4', '5', '6', '7'];
 
         this.state = Object.assign({}, defaultState, defaultColors, this.props.state);
+        this.onPresetSelect = this.onPresetSelect.bind(this);
     }
 
     onChange(key, value) {
@@ -91,12 +116,20 @@ class Layout extends Component {
         this.onChange(key, newValue);
     }
 
+    onPresetSelect(colors) {
+        this.setState(colors);
+    }
+
+    getCurrentColors() {
+        return this.colorKeys.reduce((colors, colorKey) => Object.assign({}, colors, {[colorKey]: this.state[colorKey]}), {})
+    }
+
     isWeatherEnabled() {
         return this.isEnabled(this.weatherModules);
     }
 
     isHealthEnabled() {
-        return this.isEnabled(this.healthModules);
+        return this.isEnabled(this.healthModules) || this.state.useSleep;
     }
 
     isEnabled(moduleIndexes) {
@@ -167,11 +200,13 @@ class Layout extends Component {
         return (
             <div>
                 <h1 className='title'>Timeboxed</h1>
-                <span className='version'>v3.0 <span className='update'>[v3.1 available]</span></span>
+                <VersionIndicator version='3.0' latest='3.1' />
+
                 <OptionGroup title='General'>
                     <ToggleField fieldName='useLeadingZero' label='Hours with leading zero' checked={state.useLeadingZero} onChange={this.onChange.bind(this, 'useLeadingZero')}/>
                     <ToggleField fieldName='useBluetoothDisconnect' label='Vibrate on Bluetooth disconnect' checked={state.useBluetoothDisconnect} onChange={this.onChange.bind(this, 'useBluetoothDisconnect')}/>
                     <ToggleField fieldName='updates' label='Check for updates' checked={state.useUpdates} onChange={this.onChange.bind(this, 'useUpdates')} />
+
                     <DropdownField fieldName='timezones' label='Additional Timezone' options={[
                         {value: '0', label: 'America/Los_Angeles'},
                         {value: '1', label: 'America/Sao_Paulo'},
@@ -211,6 +246,9 @@ class Layout extends Component {
                         {value: '4', label: 'Din'},
                         {value: '5', label: 'Prototype'}
                     ]} selectedItem={state.font} onChange={this.onChangeDropdown.bind(this, 'font')}/>
+                </OptionGroup>
+
+                <OptionGroup title='Colors'>
                     <ColorPicker fieldName='backgroundColor' label='Background color' color={state.bgColor} onChange={this.onChange.bind(this, 'bgColor')} />
                     <ColorPicker fieldName='textColor' label='Foreground color' color={state.fgColor} onChange={this.onChange.bind(this, 'fgColor')} />
                     <ToggleField fieldName='useAdvanced' label='Advanced Colors' checked={state.useAdvanced} onChange={this.onChange.bind(this, 'useAdvanced')} />
@@ -218,10 +256,57 @@ class Layout extends Component {
                         <div>
                             <ColorPicker fieldName='dateColor' label='Date color' color={state.dateColor} onChange={this.onChange.bind(this, 'dateColor')} />
                             <ColorPicker fieldName='altColor' label='Alternate time color' color={state.altColor} onChange={this.onChange.bind(this, 'altColor')} />
-                            <ColorPicker fieldName='batteryColor' label='Battery color' color={state.batteryColor} onChange={this.onChange.bind(this, 'batteryColor')} />
-                            <ColorPicker fieldName='batteryLowColor' label='Low battery color' color={state.batteryLowColor} onChange={this.onChange.bind(this, 'batteryLowColor')} />
+                            <ColorPicker 
+                                fieldName='batteryColor' label='Battery/Low Battery color' color={state.batteryColor} onChange={this.onChange.bind(this, 'batteryColor')} 
+                                secondColor={state.batteryLowColor} onSecondColorChange={this.onChange.bind(this, 'batteryLowColor')} />
+                            <ColorPicker fieldName='bluetoothDisconnected' label='Bluetooth disconnected' color={state.bluetoothDisconnected} onChange={this.onChange.bind(this, 'bluetoothDisconnected')} />
+                            <ColorPicker fieldName='updateNotification' label='Update notification' color={state.updateNotification} onChange={this.onChange.bind(this, 'updateNotification')} />
+                            {this.isEnabled(['1']) ?
+                                <ColorPicker
+                                    fieldName='weatherIcon' label='Weather icon/temperature' color={state.weatherIcon} onChange={this.onChange.bind(this, 'weatherIcon')}
+                                    secondColor={state.curTemp} onSecondColorChange={this.onChange.bind(this, 'curTemp')}/>
+                            : null}
+                            {this.isEnabled(['2']) ?
+                                <ColorPicker
+                                    fieldName='minMaxTemp' label='Min/Max temperature' color={state.minTemp} onChange={this.onChange.bind(this, 'minTemp')}
+                                    secondColor={state.maxTemp} onSecondColorChange={this.onChange.bind(this, 'maxTemp')}/>
+                            : null}
+                            {this.isEnabled(['3']) ?
+                                <ColorPicker
+                                    fieldName='steps' label='Steps/falling behind' color={state.steps} onChange={this.onChange.bind(this, 'steps')}
+                                    secondColor={state.stepsBehind} onSecondColorChange={this.onChange.bind(this, 'stepsBehind')} />
+                            : null}
+                            {this.isEnabled(['4']) ?
+                                <ColorPicker
+                                    fieldName='dist' label='Distance/falling behind' color={state.dist} onChange={this.onChange.bind(this, 'dist')}
+                                    secondColor={state.distBehind} onSecondColorChange={this.onChange.bind(this, 'distBehind')} />
+                            : null}
+                            {this.isEnabled(['5']) ?
+                                <ColorPicker
+                                    fieldName='cal' label='Calories/falling behind' color={state.cal} onChange={this.onChange.bind(this, 'cal')}
+                                    secondColor={state.calBehind} onSecondColorChange={this.onChange.bind(this, 'calBehind')} />
+                            : null}
+                            {this.isEnabled(['6']) ?
+                                <ColorPicker
+                                    fieldName='sleep' label='Sleep/falling behind' color={state.sleep} onChange={this.onChange.bind(this, 'sleep')}
+                                    secondColor={state.sleepBehind} onSecondColorChange={this.onChange.bind(this, 'sleepBehind')} />
+                            : null}
+                            {this.isEnabled(['7']) ?
+                                <ColorPicker
+                                    fieldName='deep' label='Deep sleep/falling behind' color={state.deep} onChange={this.onChange.bind(this, 'deep')}
+                                    secondColor={state.deepBehind} onSecondColorChange={this.onChange.bind(this, 'deepBehind')} />
+                            : null}
+                            {this.isEnabled(['8']) ?
+                                <ColorPicker
+                                    fieldName='windSpeed' label='Wind direction/speed' color={state.windDir} onChange={this.onChange.bind(this, 'windDir')}
+                                    secondColor={state.windSpeed} onSecondColorChange={this.onChange.bind(this, 'windSpeed')} />
+                            : null}
                         </div>
                     : null}
+                </OptionGroup>
+
+                <OptionGroup title='Color Presets'>
+                    <ColorPresets colors={this.getCurrentColors()} onSelect={this.onPresetSelect}/>
                 </OptionGroup>
 
                 {this.isWeatherEnabled() ?
@@ -242,7 +327,9 @@ class Layout extends Component {
                             </div>
                         : null}
 
-                        <ToggleField fieldName='useCelsius' label='Use Celsius' checked={state.useCelsius} onChange={this.onChange.bind(this, 'useCelsius')} />
+                        {this.isEnabled(['1', '2']) ?
+                            <ToggleField fieldName='useCelsius' label='Use Celsius' checked={state.useCelsius} onChange={this.onChange.bind(this, 'useCelsius')} />
+                        : null}
                         <TextField fieldName='manualLocation' buttonLabel='Verify'
                             label='Manual Location' labelPosition='top'
                             value={state.manualLocation}

@@ -9,11 +9,15 @@ class ColorPicker extends Component {
         super(props);
         this.state = {
             color: props.color,
+            secondColor: props.secondColor,
             panelVisible: false,
+            secondPanelVisible: false,
         };
         this.onColorChange = this.onColorChange.bind(this);
+        this.onSecondColorChange = this.onSecondColorChange.bind(this);
         this.showPanel = this.showPanel.bind(this);
         this.togglePanel = this.togglePanel.bind(this);
+        this.toggleSecondPanel = this.toggleSecondPanel.bind(this);
         this.hidePanel = this.hidePanel.bind(this);
 
     }
@@ -26,20 +30,38 @@ class ColorPicker extends Component {
         this.hidePanel();
     }
 
+    onSecondColorChange(color) {
+        this.setState({secondColor: color});
+        if (this.props.onSecondColorChange) {
+            this.props.onSecondColorChange(color);
+        }
+        this.hidePanel();
+    }
+
     showPanel() {
         this.setState({panelVisible: true});
     }
 
     hidePanel() {
-        this.setState({panelVisible: false});
+        this.setState({panelVisible: false, secondPanelVisible: false});
     }
 
     togglePanel() {
         this.setState({panelVisible: !this.state.panelVisible});
     }
+    
+    toggleSecondPanel() {
+        this.setState({secondPanelVisible: !this.state.secondPanelVisible});
+    }
 
     shouldComponentUpdate(nextProps, nextState) {
-        return this.state.panelVisible !== nextState.panelVisible || this.state.color !== nextState.color || this.state.sunny != nextState.sunny;
+        return this.state !== nextState;
+    }
+
+    componentWillReceiveProps(nextProps) {
+        if (this.state.color != nextProps.color) {
+            this.setState({color: nextProps.color});
+        }
     }
 
     render() {
@@ -49,10 +71,15 @@ class ColorPicker extends Component {
                     <div className='swatch' onClick={this.togglePanel}>
                         <div className='swatch--color' style={{backgroundColor: this.state.color}}></div>
                     </div>
+                    {this.state.secondColor ?
+                        <div className='swatch' onClick={this.toggleSecondPanel}>
+                            <div className='swatch--color' style={{backgroundColor: this.state.secondColor}}></div>
+                        </div>
+                    : null}
                 </Field>
-                {this.state.panelVisible ?
+                {this.state.panelVisible || this.state.secondPanelVisible ?
                     <div className='color-panel'>
-                        <Swatches onColorChange={this.onColorChange} />
+                        <Swatches onColorChange={this.state.panelVisible ? this.onColorChange : this.onSecondColorChange} />
                         <div className='color-panel--shim' onClick={this.hidePanel}></div>
                     </div>
                 : null}
