@@ -1,7 +1,110 @@
-export function getFirstKeyFromObject(dict) {
-    for (let index in dict) {
-        if (dict.hasOwnProperty(index)) {
-            return index;
+import fetch from 'isomorphic-fetch';
+
+const getCurrentVersion = () => {
+    return getUrlParam('v');
+};
+
+const getUrlParam = (param) => {
+    let urlParamList = window.location.search.substring(1);
+    let urlParams = urlParamList.split('&');
+    for (let item in urlParams) {
+        let elem = urlParams[item];
+        let keyValue = elem.split('=');
+        if (keyValue[0] === param) {
+            return keyValue[1];
         }
     }
+    return '';
+};
+
+const checkForUpdates = (callback) => {
+    if (!getCurrentVersion()) {
+        callback(false);
+    }
+    let url = 'http://pblweb.com/api/v1/version/1354d7dc-b9e5-420d-9edf-533ee2fd4520.json?current=' + getCurrentVersion();
+
+    fetch(url)
+        .then(response => {
+            if (response.status >= 400) {
+                throw new Error("Bad response from server");
+            }
+            return response.json();
+        })
+        .then(json => {
+            callback(json.newer, json.version);
+        })
+        .catch(ex => {
+            console.log(ex.stack);
+            callback(false);
+        });
+};
+
+const providerUrls = {
+    '0': 'http://api.openweathermap.org/data/2.5/weather?appid=979cbf006bf67bc368a54af240d15cf3&q=${location}',
+    '1': 'http://api.wunderground.com/api/${apiKey}/conditions/forecast/q/${location}.json',
+    '2': 'https://query.yahooapis.com/v1/public/yql?format=json&env=store%3A%2F%2Fdatatables.org%2Falltableswithkeys&q=select%20*%20from%20weather.forecast%20where%20woeid%20in%20(select%20woeid%20from%20geo.places%20where%20text%3D%22${location}%22)', 
 }
+
+const verifyLocation = (loc, provider, apiKey, callback=() => {}) => {
+    if (!loc) {
+        callback(false);
+        return;
+    }
+    apiKey = apiKey || '';
+    loc = encodeURIComponent(loc);
+    let url = providerUrls[provider].replace('${location}', loc).replace('${apiKey}', apiKey);
+
+    fetch(url)
+        .then(response => {
+            if (response.status >= 400) {
+                throw new Error("Bad response from server");
+            }
+            return response.json();
+        })
+        .then(json => {
+            switch(provider) {
+                case '0':
+		    if (parseInt(json.cod, 10) === 404) {
+			alert('Invalid location');
+                        callback(false);
+		    } else {
+			alert('Valid location!');
+                        callback(true);
+		    }
+                    break;
+                case '1':
+		    if (json.response.error || ! json.current_observation) {
+			if (json.response.error && json.response.error.type === 'keynotfound') {
+			    alert('Invalid WeatherUnderground Key');
+                            callback(false);
+			} else {
+			    alert('Invalid location');
+                            callback(false);
+			}
+		    } else {
+			alert('Valid location!');
+                        callback(true);
+		    }
+                    break;
+                case '2':
+		    if (json.query.count !== 1) {
+			alert('Invalid location');
+                        callback(false);
+		    } else {
+			alert('Valid location!');
+                        callback(true);
+		    }
+                    break;
+                default:
+                    callback(false);
+                    break;
+            }
+        })
+        .catch(ex => {
+            console.log(ex.stack);
+            callback(false);
+        });
+
+};
+
+export { getCurrentVersion, checkForUpdates, verifyLocation }

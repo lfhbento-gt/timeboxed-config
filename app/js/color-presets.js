@@ -1,9 +1,10 @@
 import React, { PropTypes, Component } from 'react';
 import TextField from './text-field';
+import { getText } from './lang';
 
 class ColorPresets extends Component {
-    constructor(props) {
-        super(props);
+    constructor(props, context) {
+        super(props, context);
 
         this.defaultPresets = {
             'Black and white': {
@@ -68,6 +69,7 @@ class ColorPresets extends Component {
 
         this.onAddClick = this.onAddClick.bind(this);
         this.storePresets = this.storePresets.bind(this);
+        this._ = getText.bind(this, context.locale);
     }
     
     getStoredPresets() {
@@ -91,11 +93,11 @@ class ColorPresets extends Component {
 
     onAddClick(name) {
         if (Object.keys(this.defaultPresets).indexOf(name) !== -1) {
-            alert(`You can't replace default ${name} preset. Choose a different name :)`);
+            alert(this._('You can\'t replace default ${name} preset. Choose a different name :)', {name}));
             return;
         }
         if (Object.keys(this.state.presets).indexOf(name) !== -1) {
-            if (!confirm(`This will replace the ${name} preset. Continue?`)) {
+            if (!confirm(this._('This will replace the ${name} preset. Continue?', {name}))) {
                 return;
             }
         }
@@ -105,7 +107,7 @@ class ColorPresets extends Component {
     }
 
     onRemoveClick(name, e) {
-        if (confirm(`Remove the preset ${name}?`)) {
+        if (confirm(this._('Remove the preset ${name}?', {name}))) {
             let presets = Object.assign({}, this.state.presets);
             delete presets[name];
             this.setState({presets: presets});
@@ -129,7 +131,7 @@ class ColorPresets extends Component {
                         )
                     })}
                 </div>
-                <TextField fieldName='presetName' buttonLabel='Add New'
+                <TextField fieldName='presetName' buttonLabel={this._('Add New')}
                     value=''
                     onButtonClick={this.onAddClick}/>
             </div>
@@ -143,6 +145,10 @@ ColorPresets.propTypes = {
 
 ColorPresets.defaultProps = {
     
+}
+
+ColorPresets.contextTypes = {
+    locale: PropTypes.string
 }
 
 export default ColorPresets
