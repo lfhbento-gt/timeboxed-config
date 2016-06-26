@@ -39,6 +39,10 @@ var config = {
 
 if (ENV === 'production') {
     config = merge(config, {
+        output: {
+            path: __dirname + '/dist',
+            filename: 'app.min.js'
+        },
         devtool: 'source-map',
         plugins: [
             new webpack.DefinePlugin({

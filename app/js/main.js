@@ -25,7 +25,7 @@ const getStoredData = () => {
         let value = localStorage[key] || '';
 
         value = value === 'true' || value === 'false' ? JSON.parse(value) : value;
-        value = value instanceof String && value.indexOf('0x') !== -1 ? value.replace('0x', '#') : value;
+        value = typeof value === 'string' && value.indexOf('0x') !== -1 ? value.replace('0x', '#') : value;
 
         return Object.assign(data, {[key]: value}); 
     }, {});
