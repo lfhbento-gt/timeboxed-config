@@ -76,6 +76,8 @@ class Layout extends Component {
 
         this.colorKeys = Object.keys(defaultColors);
 
+        let newState = this.filterValidKeys(this.props.state, [...this.colorKeys, ...Object.keys(defaultState)]);
+
         this.moduleStateKeys = [
             'slotA',
             'slotB',
@@ -90,7 +92,7 @@ class Layout extends Component {
         ];
 
 
-        this.state = Object.assign({}, defaultState, defaultColors, this.props.state);
+        this.state = Object.assign({}, defaultState, defaultColors, newState);
         this.onPresetSelect = this.onPresetSelect.bind(this);
         this.verifyLocation = this.verifyLocation.bind(this);
         this._ = getText.bind(this, getLocaleById(this.state.locale));
@@ -208,6 +210,16 @@ class Layout extends Component {
 
         this.weatherModules = ['1', '2', '8'];
         this.healthModules = ['3', '4', '5', '6', '7'];
+    }
+
+    filterValidKeys(data, keys) {
+        let newData = Object.assign({}, data);
+        Object.keys(newData).map(key => {
+            if (keys.indexOf(key) === -1) {
+                delete newData[key];
+            }
+        });
+        return newData;
     }
 
     getChildContext() {
