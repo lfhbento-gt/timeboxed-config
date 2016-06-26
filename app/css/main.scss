@@ -135,8 +135,26 @@ html, body {
 
 .helper-text {
     color: #999;
-    margin-top: -6px;
+    line-height: 14px;
+    text-align: left;
+}
+
+.helper-text--field {
+    margin-top: -8px;
+    margin-bottom: 8px;
     padding: 0 6px;
+}
+
+.helper-text--standalone {
+    padding: 6px;
+}
+
+.btn-submit {
+    margin: 12px;
+}
+
+.btn--donate {
+    margin-left: 6px;
 }
 
 .color-picker {
@@ -224,6 +242,14 @@ label.rt-toggle {
     box-shadow:         1px 1px 4px 0 #efefef;  /* Opera 10.5, IE 9, Firefox 4+, Chrome 6+, iOS 5 */
     margin: 8px;
     border-radius: 4px;
+}
+
+.block--footer {
+    padding: 0 12px 12px;
+}
+
+.block--submit {
+    text-align: center;
 }
 
 .card-block--custom {

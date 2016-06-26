@@ -1,4 +1,5 @@
 import React from 'react';
+import FastClick from 'react-fastclick-alt';
 import Field from './field';
 import classnames from 'classnames';
 import Toggle from 'react-input-toggle/dist/react-input-toggle';
@@ -15,7 +16,7 @@ class ToggleField extends React.Component {
         return (
             <Field label={this.props.label} fieldName={this.props.fieldName} longLabel={true}>
                 <label>
-                    <Toggle effect='bbounce' onChange={this.toggleCheckbox} checked={this.state.checked}/>
+                    <FastClick><Toggle effect='bbounce' onChange={this.toggleCheckbox} checked={this.state.checked}/></FastClick>
                 </label>
             </Field>
         )

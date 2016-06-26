@@ -1,5 +1,7 @@
 import React, { PropTypes, Component } from 'react';
+import FastClick from 'react-fastclick-alt';
 import RadioButtonGroup from './button-group';
+import { getPlatform } from './util/util';
 
 class Swatches extends Component {
     constructor(props) {
@@ -40,6 +42,8 @@ class Swatches extends Component {
             '#ffaaff': '#ecc3eb', '#ffff00': '#ffeeab', '#ffff55': '#fff1b5', '#ffffaa': '#fff6d3'
         };
 
+        this.bwColors = [['#000000', '#AAAAAA', '#FFFFFF']];
+
         this.sunlightColors = this.colors.map(list => list.map(item => this.sunlightColorMap[item]));
 
         this.onColorTypeChange = this.onColorTypeChange.bind(this);
@@ -52,15 +56,19 @@ class Swatches extends Component {
     render() {
         return (
             <div className='color-panel--swatches'>
-                <RadioButtonGroup fieldName='colorType' size='small' options={[
-                    {value: '0', label: 'Normal'},
-                    {value: '1', label: 'Sunny'},
-                ]} selectedItem={this.state.sunny ? '1' : '0'} onChange={this.onColorTypeChange}/>
-                {
-                    (this.state.sunny
-                        ? <SwatchRows colors={this.sunlightColors} onColorChange={this.props.onColorChange} />
-                        : <SwatchRows colors={this.colors} onColorChange={this.props.onColorChange} />)
-                }
+                {getPlatform() === 'aplite' ? 
+                    <SwatchRows colors={this.bwColors} onColorChange={this.props.onColorChange} />
+                : <div>
+                    <RadioButtonGroup fieldName='colorType' size='small' options={[
+                        {value: '0', label: 'Normal'},
+                        {value: '1', label: 'Sunny'},
+                    ]} selectedItem={this.state.sunny ? '1' : '0'} onChange={this.onColorTypeChange}/>
+                    <FastClick> {
+                        (this.state.sunny
+                            ? <SwatchRows colors={this.sunlightColors} onColorChange={this.props.onColorChange} />
+                            : <SwatchRows colors={this.colors} onColorChange={this.props.onColorChange} />)
+                    }</FastClick>
+                </div>}
             </div>
         );
     }
@@ -81,7 +89,7 @@ const SwatchRows = (props) => {
                 return (
                     <div className='color-panel--swatch-row' key={index}>
                     {
-                        list.map((color, index) => <SwatchItem color={color} onClick={props.onColorChange} key={index} />)
+                        list.map((color, index) => <SwatchItem color={color} hasBorder={color === '#FFFFFF'} onClick={props.onColorChange} key={index} />)
                     }
                     </div>
                 )
@@ -108,6 +116,9 @@ class SwatchItem extends Component {
         let style = {};
         if (this.props.color) {
             style.backgroundColor = this.props.color;
+        }
+        if (this.props.hasBorder) {
+            style.border = '1px solid #CCC';
         }
         return (
             <div className='color-panel--swatch-item' onClick={this.onClickHandler} style={style}></div>

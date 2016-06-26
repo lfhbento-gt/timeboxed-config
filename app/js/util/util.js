@@ -1,20 +1,27 @@
 import fetch from 'isomorphic-fetch';
 
 const getCurrentVersion = () => {
-    return getUrlParam('v');
+    return getQueryParam('v');
 };
 
-const getUrlParam = (param) => {
-    let urlParamList = window.location.search.substring(1);
-    let urlParams = urlParamList.split('&');
-    for (let item in urlParams) {
-        let elem = urlParams[item];
-        let keyValue = elem.split('=');
-        if (keyValue[0] === param) {
-            return keyValue[1];
-        }
+const getPlatform = () => {
+    return getQueryParam('p');
+};
+
+const getReturnUrl = () => {
+    return getQueryParam('return_to', 'pebblejs://close#');
+};
+
+const getQueryParam = (variable, defaultValue) => {
+    let query = location.search.substring(1);
+    let vars = query.split('&');
+    for (let i = 0; i < vars.length; i++) {
+	let pair = vars[i].split('=');
+	if (pair[0] === variable) {
+	    return decodeURIComponent(pair[1]);
+	}
     }
-    return '';
+    return defaultValue || '';
 };
 
 const checkForUpdates = (callback) => {
@@ -87,7 +94,7 @@ const verifyLocation = (loc, provider, apiKey, callback=() => {}) => {
 		    }
                     break;
                 case '2':
-		    if (json.query.count !== 1) {
+		    if (json.query.count === 0) {
 			alert('Invalid location');
                         callback(false);
 		    } else {
@@ -107,4 +114,4 @@ const verifyLocation = (loc, provider, apiKey, callback=() => {}) => {
 
 };
 
-export { getCurrentVersion, checkForUpdates, verifyLocation }
+export { getCurrentVersion, checkForUpdates, verifyLocation, getReturnUrl, getPlatform }

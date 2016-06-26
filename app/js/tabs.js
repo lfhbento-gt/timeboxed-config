@@ -1,4 +1,5 @@
 import React, { PropTypes, Component } from 'react';
+import FastClick from 'react-fastclick-alt';
 import classnames from 'classnames';
 
 class TabContainer extends Component {
@@ -41,7 +42,9 @@ class TabContainer extends Component {
         return (
             <div className='tab-container'>
                 <ul className='nav nav-tabs'>
-                    {titles}
+                    <FastClick>
+                        {titles}
+                    </FastClick>
                 </ul>
                 <div className='tab-content'>
                     {items[this.state.selectedTab]}

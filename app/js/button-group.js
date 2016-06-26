@@ -1,4 +1,5 @@
 import React from 'react';
+import FastClick from 'react-fastclick-alt';
 import Field from './field';
 import classnames from 'classnames';
 
@@ -11,7 +12,7 @@ class RadioButtonGroup extends React.Component {
     render() {
         return (
             <Field fieldName={this.props.fieldName} label={this.props.label} labelPosition={this.props.labelPosition}>
-                <div className='btn-group'>
+                <FastClick><div className='btn-group'>
                     {
                         this.props.options.map((item, index) => {
                             let classes = {
@@ -31,7 +32,7 @@ class RadioButtonGroup extends React.Component {
                             );
                         })
                     }
-                </div>
+                </div></FastClick>
             </Field>
         );
     }

@@ -10,7 +10,9 @@
     "isomorphic-fetch": "^2.2.1",
     "jquery": "^2.2.3",
     "react": "^15.1.0",
-    "react-dom": "^15.0.1"
+    "react-dom": "^15.0.1",
+    "react-fastclick": "^2.1.2",
+    "react-fastclick-alt": "^1.0.1"
   },
   "devDependencies": {
     "babel-core": "^6.7.6",
