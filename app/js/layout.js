@@ -387,6 +387,21 @@ class Layout extends Component {
                 <VersionIndicator />
 
                 <OptionGroup title={this._('General')}>
+                    {getPlatform() !== 'chalk' ?
+                        <RadioButtonGroup fieldName='textAlign' label='Text Align' options={[
+                            {value: '0', label: this._('Left')},
+                            {value: '1', label: this._('Center')},
+                            {value: '2', label: this._('Right')},
+                        ]} selectedItem={state.textAlign} onChange={this.onChange.bind(this, 'textAlign')}/>
+                    : null}
+                    <DropdownField fieldName='fontType' label='Font' options={[
+                        {value: '0', label: 'Blocko'},
+                        {value: '1', label: 'Bloco (big)'},
+                        {value: '2', label: 'Pebble fonts'},
+                        {value: '3', label: 'Archivo'},
+                        {value: '4', label: 'Din'},
+                        {value: '5', label: 'Prototype'}
+                    ]} selectedItem={state.fontType} onChange={this.onChangeDropdown.bind(this, 'fontType')}/>
                     <ToggleField fieldName='leadingZero' label={this._('Hours with leading zero')} checked={state.leadingZero} onChange={this.onChange.bind(this, 'leadingZero')}/>
                     <ToggleField fieldName='bluetoothDisconnect' label={this._('Vibrate on Bluetooth disconnect')} checked={state.bluetoothDisconnect} onChange={this.onChange.bind(this, 'bluetoothDisconnect')}/>
                     <ToggleField fieldName='updates' label={this._('Check for updates')} checked={state.update} onChange={this.onChange.bind(this, 'update')} />
@@ -407,34 +422,16 @@ class Layout extends Component {
                 <OptionGroup title={this._('Localization')}>
                     <DropdownField fieldName='locale' label={this._('Language')} options={this.locales} searchable={true} clearable={false} selectedItem={state.locale} onChange={this.onChangeDropdown.bind(this, 'locale')}/>
                     <DropdownField fieldName='dateFormat' label={this._('Date format')} options={[
-                        {value: '0', label: this._('Day of week/month/day')},
-                        {value: '1', label: this._('Day of week/day/month')},
+                        {value: '0', label: this._('Day of week, month, day')},
+                        {value: '1', label: this._('Day of week, day, month')},
                     ]} searchable={false} clearable={false} selectedItem={state.dateFormat} onChange={this.onChangeDropdown.bind(this, 'dateFormat')}/>
-                </OptionGroup>
-
-                <OptionGroup title={this._('Appearance')}>
-                    {getPlatform() !== 'chalk' ?
-                        <RadioButtonGroup fieldName='textAlign' label='Text Align' options={[
-                            {value: '0', label: this._('Left')},
-                            {value: '1', label: this._('Center')},
-                            {value: '2', label: this._('Right')},
-                        ]} selectedItem={state.textAlign} onChange={this.onChange.bind(this, 'textAlign')}/>
-                    : null}
-                    <DropdownField fieldName='fontType' label='Font' options={[
-                        {value: '0', label: 'Blocko'},
-                        {value: '1', label: 'Bloco (big)'},
-                        {value: '2', label: 'Pebble fonts'},
-                        {value: '3', label: 'Archivo'},
-                        {value: '4', label: 'Din'},
-                        {value: '5', label: 'Prototype'}
-                    ]} selectedItem={state.fontType} onChange={this.onChangeDropdown.bind(this, 'fontType')}/>
                 </OptionGroup>
 
                 <OptionGroup title={this._('Colors')}>
                     <ColorPicker fieldName='backgroundColor' label={this._('Background color')} color={state.bgColor} onChange={this.onChange.bind(this, 'bgColor')} />
                     <ColorPicker fieldName='textColor' label={this._('Foreground color')} color={state.hoursColor} onChange={this.onChange.bind(this, 'hoursColor')} />
                     <ToggleField fieldName='enableAdvanced' label={this._('Advanced Colors')} checked={state.enableAdvanced} onChange={this.onChange.bind(this, 'enableAdvanced')} />
-                    <HelperText>{this._('Enables specific color configuration for watchface items. If disabled, all text will have the same color as the selection for \'Foreground Color\' above.')}</HelperText>
+                    <HelperText>{this._('Enables specific color configuration for watchface items. If disabled, all text will have the same color as the selection for \'Foreground Color\' above. This also lets you save and load color presets.')}</HelperText>
                     {state.enableAdvanced ?
                         <div>
                             <ColorPicker fieldName='dateColor' label={this._('Date color')} color={state.dateColor} onChange={this.onChange.bind(this, 'dateColor')} />
@@ -488,9 +485,11 @@ class Layout extends Component {
                     : null}
                 </OptionGroup>
 
-                <OptionGroup title={this._('Color Presets')}>
-                    <ColorPresets colors={this.getCurrentColors()} onSelect={this.onPresetSelect}/>
-                </OptionGroup>
+                {state.enableAdvanced ?
+                    <OptionGroup title={this._('Color Presets')}>
+                        <ColorPresets colors={this.getCurrentColors()} onSelect={this.onPresetSelect}/>
+                    </OptionGroup>
+                : null}
 
                 {this.isWeatherEnabled() ?
                     <OptionGroup title={this._('Weather')}>

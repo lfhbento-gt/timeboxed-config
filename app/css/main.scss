@@ -242,6 +242,7 @@ label.rt-toggle {
     box-shadow:         1px 1px 4px 0 #efefef;  /* Opera 10.5, IE 9, Firefox 4+, Chrome 6+, iOS 5 */
     margin: 8px;
     border-radius: 4px;
+    margin-bottom: 12px;
 }
 
 .block--footer {
@@ -257,8 +258,10 @@ label.rt-toggle {
 }
 
 .card-header {
-    font-size: 1.25rem;
+    font-size: 1.2rem;
     padding: 0.5rem 1rem;
+    text-transform: uppercase;
+    font-weight: normal;
 }
 
 label {
