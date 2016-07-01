@@ -73,8 +73,30 @@ class ColorPresets extends Component {
     }
     
     getStoredPresets() {
-        let presets = window.localStorage['presets'];
-        return presets ? JSON.parse(presets) : {};
+        let presets = JSON.parse(window.localStorage['presets'] || '{}');
+        let oldPresets = this.getOldPresets();
+        return Object.assign({}, oldPresets, presets);
+    }
+
+    getOldPresets() {
+        return Object.keys(localStorage).reduce((presets, key) => {
+            if (key.indexOf('preset-') === 0) {
+                let presetName = key.replace('preset-', '');
+                let newPreset = JSON.parse(localStorage[key]);
+                newPreset = Object.keys(newPreset).reduce((preset, key) => {
+                    let value = newPreset[key];
+
+                    value = value === 'true' || value === 'false' ? JSON.parse(value) : value;
+                    value = typeof value === 'string' && value.indexOf('0x') !== -1 ? value.replace('0x', '#') : value;
+                    
+                    preset[key] = value;
+
+                    return preset;
+                }, {});
+                presets[presetName] = newPreset;
+            }
+            return presets;
+        }, {});
     }
 
     storePresets() {

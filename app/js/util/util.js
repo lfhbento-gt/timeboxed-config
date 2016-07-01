@@ -40,7 +40,7 @@ const checkForUpdates = (callback) => {
         .then(json => {
             callback(json.newer, json.version);
         })
-        .catch(ex => {
+        ['catch'](ex => {
             console.log(ex.stack);
             callback(false);
         });
@@ -49,7 +49,8 @@ const checkForUpdates = (callback) => {
 const providerUrls = {
     '0': 'http://api.openweathermap.org/data/2.5/weather?appid=979cbf006bf67bc368a54af240d15cf3&q=${location}',
     '1': 'http://api.wunderground.com/api/${apiKey}/conditions/forecast/q/${location}.json',
-    '2': 'https://query.yahooapis.com/v1/public/yql?format=json&env=store%3A%2F%2Fdatatables.org%2Falltableswithkeys&q=select%20*%20from%20weather.forecast%20where%20woeid%20in%20(select%20woeid%20from%20geo.places%20where%20text%3D%22${location}%22)', 
+    '2': 'https://query.yahooapis.com/v1/public/yql?format=json&env=store%3A%2F%2Fdatatables.org%2Falltableswithkeys&q=select%20*%20from%20weather.forecast%20where%20woeid%20in%20(select%20woeid%20from%20geo.places%20where%20text%3D%22${location}%22)',
+    '3': 'https://query.yahooapis.com/v1/public/yql?format=json&env=store%3A%2F%2Fdatatables.org%2Falltableswithkeys&q=select%20centroid%20from%20geo.places(1)%20where%20text%3D%22${location}%22',
 }
 
 const verifyLocation = (loc, provider, apiKey, callback=() => {}) => {
@@ -102,12 +103,21 @@ const verifyLocation = (loc, provider, apiKey, callback=() => {}) => {
                         callback(true);
 		    }
                     break;
+                case '3':
+		    if (json.query.count === 0) {
+			alert('Invalid location');
+                        callback(false);
+		    } else {
+			alert('Valid location!');
+                        callback(true);
+		    }
+                    break;
                 default:
                     callback(false);
                     break;
             }
         })
-        .catch(ex => {
+        ['catch'](ex => {
             console.log(ex.stack);
             callback(false);
         });

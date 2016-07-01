@@ -25,7 +25,7 @@ class Layout extends Component {
             leadingZero: true,
             bluetoothDisconnect: true,
             update: true,
-            timezones: '',
+            timezones: '#|0:00',
             slotA: '1',
             slotB: '2',
             slotC: '3',
@@ -44,6 +44,7 @@ class Layout extends Component {
             overrideLocation: '',
             showSleep: false,
             weatherKey: '',
+            forecastKey: '',
             speedUnit: '0',
         };
 
@@ -242,7 +243,8 @@ class Layout extends Component {
 
     onSubmit() {
 
-        if (this.needsApiKey() && !this.state.weatherKey) {
+        if ((this.weatherProviderSelected('1') && !this.state.weatherKey) ||
+                (this.weatherProviderSelected('3') && !this.state.forecastKey)) {
             alert(this._('Please enter a valid API key for the selected provider'));
             return;
         }
@@ -272,8 +274,8 @@ class Layout extends Component {
         )
     }
 
-    needsApiKey() {
-        return ['1'].indexOf(this.state.weatherProvider) !== -1;
+    weatherProviderSelected(index) {
+        return [index].indexOf(this.state.weatherProvider) !== -1;
     }
 
     componentWillUpdate(nextProps, nextState) {
@@ -406,7 +408,7 @@ class Layout extends Component {
                     <ToggleField fieldName='bluetoothDisconnect' label={this._('Vibrate on Bluetooth disconnect')} checked={state.bluetoothDisconnect} onChange={this.onChange.bind(this, 'bluetoothDisconnect')}/>
                     <ToggleField fieldName='updates' label={this._('Check for updates')} checked={state.update} onChange={this.onChange.bind(this, 'update')} />
 
-                    <DropdownField fieldName='timezones' label={this._('Additional Timezone')} options={this.timezones} searchable={true} clearable={true} selectedItem={state.timezones}  onChange={this.onChangeDropdown.bind(this, 'timezones')}/>
+                    <DropdownField fieldName='timezones' label={this._('Additional Timezone')} options={this.timezones} searchable={true} clearable={false} selectedItem={state.timezones}  onChange={this.onChangeDropdown.bind(this, 'timezones')}/>
                 </OptionGroup>
 
                 <OptionGroup title={this._('Modules')}>
@@ -493,19 +495,29 @@ class Layout extends Component {
 
                 {this.isWeatherEnabled() ?
                     <OptionGroup title={this._('Weather')}>
-                        <RadioButtonGroup fieldName='provider' label={this._('Weather provider')} labelPosition='top' options={[
-                            {value: '0', label: 'OpenWeather'},
-                            {value: '1', label: 'WUnderground'},
+                        <DropdownField fieldName='provider' label={this._('Weather provider')} options={[
+                            {value: '0', label: 'OpenWeatherMap'},
+                            {value: '1', label: 'WeatherUnderground'},
                             {value: '2', label: 'Yahoo'},
-                        ]} selectedItem={state.weatherProvider} onChange={this.onChange.bind(this, 'weatherProvider')}/>
+                            {value: '3', label: 'Dark Sky/Forecast.io'},
+                        ]} selectedItem={state.weatherProvider} onChange={this.onChangeDropdown.bind(this, 'weatherProvider')}/>
 
-                        {this.needsApiKey() ?
+                        {this.weatherProviderSelected('1') ?
                             <div>
                                 <TextField fieldName='weatherKey'
                                     label={this._('API Key')}
                                     value={state.weatherKey}
                                     onChange={this.onChange.bind(this, 'weatherKey')}/> 
-                                <HelperText>{this._('<strong>Note:</strong> If you decide to use WeatherUnderground, you need an API key. Go to <a href="http://www.wunderground.com/weather/api/?apiref=73d2b41a1a02e3bd">wunderground.com</a> to create a free account and get a key and insert it above.')}</HelperText>
+                                <HelperText>{this._('<strong>Note:</strong> For WeatherUnderground, you need an API key. Go to <a href="http://www.wunderground.com/weather/api/?apiref=73d2b41a1a02e3bd">wunderground.com</a> to create a free account and get a key and insert it above.')}</HelperText>
+                            </div>
+                        : null}
+                        {this.weatherProviderSelected('3') ?
+                            <div>
+                                <TextField fieldName='forecastKey'
+                                    label={this._('API Key')}
+                                    value={state.forecastKey}
+                                    onChange={this.onChange.bind(this, 'forecastKey')}/> 
+                                <HelperText>{this._('<strong>Note:</strong> For Dark Sky/Forecast.io, you need an API key. Go to <a href="https://developer.forecast.io/">developer.forecast.io/</a> to create a free account and get a key and insert it above.')}</HelperText>
                             </div>
                         : null}
 

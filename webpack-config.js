@@ -3,6 +3,7 @@ var HtmlWebpackPlugin = require('html-webpack-plugin');
 var CompressionPlugin = require('compression-webpack-plugin');
 var webpack = require('webpack');
 var merge = require('webpack-merge');
+var autoprefixer = require('autoprefixer');
 
 var ENV = process.env.NODE_ENV || 'development';
 
@@ -29,12 +30,13 @@ var config = {
     module: {
         loaders: [
             { test: /\.js/, loader: 'babel-loader', exclude: /node_modules\//, query: {presets: ['es2015', 'react']} },
-            { test: /\.scss$/, loaders: ['style-loader', 'css-loader', 'sass-loader'] },
-            { test: /\.css$/, loaders: ['style-loader', 'css-loader'] },
+            { test: /\.scss$/, loaders: ['style-loader', 'css-loader?-autoprefixer', 'postcss-loader', 'sass-loader'] },
+            { test: /\.css$/, loaders: ['style-loader', 'css-loader?-autoprefixer'] },
             { test: /\.woff(2)?(\?v=[0-9]\.[0-9]\.[0-9])?$/, loader: "url-loader?limit=10000&minetype=application/font-woff" },
             { test: /\.(ttf|eot|svg)(\?v=[0-9]\.[0-9]\.[0-9])?$/, loader: "file-loader" }
         ]
-    }
+    },
+    postcss: [ autoprefixer({ browsers: ['iOS 8'] }) ]
 };
 
 if (ENV === 'production') {

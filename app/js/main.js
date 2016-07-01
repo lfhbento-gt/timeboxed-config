@@ -1,8 +1,17 @@
+import objectAssign from 'object-assign';
+if (!Object.assign) {
+    Object.prototype.assign = objectAssign;
+}
+
+import es6Promise from 'es6-promise';
+es6Promise.polyfill();
+
 import React from 'react';
 import ReactDOM from 'react-dom';
 import Layout from './layout';
 import { getReturnUrl } from './util/util';
 
+try {
 
 const onSubmit = (data) => {
     storeData(data);
@@ -18,6 +27,7 @@ const storeData = (data) => {
 
 const getStoredData = () => {
     return Object.keys(localStorage).reduce((data, key) => {
+
         if (key === 'presets') {
             return data;
         }
@@ -50,3 +60,7 @@ ReactDOM.render(
     <Layout onSubmit={onSubmit} state={getStoredData()} />,
     document.getElementById('content')
 );
+
+} catch (ex) {
+    alert(ex.stack);
+}
