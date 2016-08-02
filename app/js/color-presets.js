@@ -94,6 +94,8 @@ class ColorPresets extends Component {
                     return preset;
                 }, {});
                 presets[presetName] = newPreset;
+                delete localStorage[key];
+                this.storePresets();
             }
             return presets;
         }, {});

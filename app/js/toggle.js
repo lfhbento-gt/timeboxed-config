@@ -22,6 +22,13 @@ class ToggleField extends React.Component {
         )
     }
 
+    componentWillReceiveProps(nextProps) {
+        if (this.props.checked !== nextProps.checked) {
+            this.toggleCheckbox({target: {checked: !!nextProps.checked}});
+        }
+    }
+
+
     toggleCheckbox(e) {
         let value = !!e.target.checked;
         this.setState({checked: value});
@@ -34,11 +41,11 @@ class ToggleField extends React.Component {
 ToggleField.propTypes = {
     checked: React.PropTypes.bool,
     fieldName: React.PropTypes.string.isRequired,
-    label: React.PropTypes.string
+    label: React.PropTypes.string,
 }
 
 ToggleField.defaultProps = {
-    checked: false
+    checked: false,
 }
 
 export default ToggleField

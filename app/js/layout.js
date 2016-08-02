@@ -21,7 +21,7 @@ import '../css/main.scss';
 class Layout extends Component {
     constructor(props) {
         super(props);
-        let defaultState = {
+        this.defaultState = {
             leadingZero: true,
             bluetoothDisconnect: true,
             update: true,
@@ -46,9 +46,10 @@ class Layout extends Component {
             weatherKey: '',
             forecastKey: '',
             speedUnit: '0',
+            showDebug: false,
         };
 
-        let defaultColors = {
+        this.defaultColors = {
             bgColor: '#000000',
             hoursColor: '#FFFFFF',
             dateColor: '#FFFFFF',
@@ -75,9 +76,13 @@ class Layout extends Component {
             windSpeedColor: '#FFFFFF',
         };
 
-        this.colorKeys = Object.keys(defaultColors);
+        this.ignoreKeys = [
+            'showDebug',
+        ];
 
-        let newState = this.filterValidKeys(this.props.state, [...this.colorKeys, ...Object.keys(defaultState)]);
+        this.colorKeys = Object.keys(this.defaultColors);
+
+        let newState = this.filterValidKeys(this.props.state, [...this.colorKeys, ...Object.keys(this.defaultState)]);
 
         this.moduleStateKeys = [
             'slotA',
@@ -92,12 +97,13 @@ class Layout extends Component {
             'sleepSlotD',
         ];
 
-
-        this.state = Object.assign({}, defaultState, defaultColors, newState);
+        this.state = Object.assign({}, this.defaultState, this.defaultColors, newState);
         this.onPresetSelect = this.onPresetSelect.bind(this);
         this.verifyLocation = this.verifyLocation.bind(this);
         this._ = getText.bind(this, getLocaleById(this.state.locale));
         this.onSubmit = this.onSubmit.bind(this);
+        this.toggleDebug = this.toggleDebug.bind(this);
+        this.wipeConfigs = this.wipeConfigs.bind(this);
         
         this.modulesAll = [
             {value: '0', label: this._('None')},
@@ -213,14 +219,23 @@ class Layout extends Component {
         this.healthModules = ['3', '4', '5', '6', '7'];
     }
 
-    filterValidKeys(data, keys) {
+    filterValidKeys(data, keys, invert = false) {
         let newData = Object.assign({}, data);
         Object.keys(newData).map(key => {
-            if (keys.indexOf(key) === -1) {
+            if ((!invert && keys.indexOf(key) === -1) || (invert && keys.indexOf(key) !== -1)) {
                 delete newData[key];
             }
         });
         return newData;
+    }
+
+    wipeConfigs() {
+        if (window.confirm('This will clean all the config data for Timeboxed saved on your phone. ' +
+                'This also wipes any custom presets, manual location and API keys you might have entered. ' +
+                'Do you want to proceed?')) {
+            window.localStorage.clear();
+            this.setState(Object.assign({}, this.defaultState, this.defaultColors));
+        }
     }
 
     getChildContext() {
@@ -241,6 +256,11 @@ class Layout extends Component {
         this.setState(colors);
     }
 
+    toggleDebug() {
+        let showDebug = this.state.showDebug;
+        this.setState({showDebug: !showDebug});
+    }
+
     onSubmit() {
 
         if ((this.weatherProviderSelected('1') && !this.state.weatherKey) ||
@@ -250,7 +270,7 @@ class Layout extends Component {
         }
 
         if (this.props.onSubmit) {
-            this.props.onSubmit(Object.assign({}, this.state));
+            this.props.onSubmit(Object.assign({}, this.filterValidKeys(this.state, this.ignoreKeys, true)));
         }
     }
 
@@ -386,7 +406,22 @@ class Layout extends Component {
         return (
             <div>
                 <h1 className='title'>Timeboxed</h1>
-                <VersionIndicator />
+                <VersionIndicator onClick={this.toggleDebug}/>
+
+                {state.showDebug ?
+                    <OptionGroup title={this._('Debug')}>
+                        <ul className='debug-list'>
+                        {
+                            Object.keys(window.localStorage).map(key => {
+                                return (
+                                    <li key={key}>{key}: {window.localStorage[key]}</li>
+                                )
+                            })
+                        }
+                        </ul>
+                        <button className='btn btn-danger' onClick={this.wipeConfigs}>Reset configs</button>
+                    </OptionGroup>
+                : null}
 
                 <OptionGroup title={this._('General')}>
                     {getPlatform() !== 'chalk' ?

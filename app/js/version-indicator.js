@@ -11,6 +11,7 @@ class VersionIndicator extends React.Component {
             latest: getCurrentVersion(),
             hasUpdate: false,
         }
+        this.onClick = this.onClick.bind(this);
     }
 
     componentWillMount() {
@@ -24,9 +25,15 @@ class VersionIndicator extends React.Component {
         });
     }
 
+    onClick() {
+        if (this.props.onClick) {
+            this.props.onClick();
+        }
+    }
+
     render() {
         return (
-            <span className='version'>{this.state.version ? `v${this.state.version}` : ' '}
+            <span className='version' onClick={this.onClick}>{this.state.version ? `v${this.state.version}` : ' '}
             {this.state.hasUpdate ?
                 <span className='update'>{getText(this.context.locale, '[v${version} available]', {version: this.state.latest})}</span>
             : null}
