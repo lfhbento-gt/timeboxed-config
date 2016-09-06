@@ -1,4 +1,4 @@
-import React, {PropTypes, Component } from 'react';
+import React, { PropTypes, Component } from 'react';
 import ColorPicker from './color-picker';
 import DropdownField from './dropdown';
 import RadioButtonGroup from './button-group';
@@ -9,10 +9,11 @@ import TextField from './text-field';
 import HelperText from './helper-text';
 import TabContainer from './tabs';
 import VersionIndicator from './version-indicator';
-import Versioned from './versioned.js';
+import Versioned, { shouldShow } from './versioned';
 import ColorPresets from './color-presets';
+import DonateButton from './donate';
 import { getLocaleById, getText } from './lang';
-import { verifyLocation, getPlatform } from './util/util';
+import { verifyLocation, getPlatform, getCurrentVersion } from './util/util';
 
 import 'bootstrap/scss/bootstrap-flex.scss';
 import 'react-select/scss/default.scss';
@@ -21,6 +22,9 @@ import '../css/main.scss';
 class Layout extends Component {
     constructor(props) {
         super(props);
+        this.currentVersion = getCurrentVersion();
+        this.platform = getPlatform();
+
         this.defaultState = {
             leadingZero: true,
             bluetoothDisconnect: true,
@@ -48,6 +52,22 @@ class Layout extends Component {
             speedUnit: '0',
             showDebug: false,
         };
+
+        this.fonts = [
+            {value: '0', label: 'Blocko'},
+            {value: '1', label: 'Bloco (big)'},
+            {value: '2', label: 'Pebble fonts'},
+            {value: '3', label: 'Archivo'},
+            {value: '4', label: 'Din'},
+            {value: '5', label: 'Prototype'}
+        ];
+
+        if (shouldShow(this.currentVersion, "3.5", null)) {
+            this.defaultState = Object.assign({}, this.defaultState, {
+                quickview: true,
+            });
+            this.fonts.push({value: '6', label: 'LECO'})
+        }
 
         this.defaultColors = {
             bgColor: '#000000',
@@ -124,7 +144,7 @@ class Layout extends Component {
             {value: '8', label: this._('Wind dir./speed')},
         ];
 
-        this.modules = getPlatform() === 'aplite' ? this.modulesAplite : this.modulesAll;
+        this.modules = this.platform === 'aplite' ? this.modulesAplite : this.modulesAll;
 
         this.timezones = [
             {value: '#|0:00', label: 'None'},
@@ -424,31 +444,33 @@ class Layout extends Component {
                 : null}
 
                 <OptionGroup title={this._('General')}>
-                    {getPlatform() !== 'chalk' ?
+                    {this.platform !== 'chalk' ?
                         <RadioButtonGroup fieldName='textAlign' label='Text Align' options={[
                             {value: '0', label: this._('Left')},
                             {value: '1', label: this._('Center')},
                             {value: '2', label: this._('Right')},
                         ]} selectedItem={state.textAlign} onChange={this.onChange.bind(this, 'textAlign')}/>
                     : null}
-                    <DropdownField fieldName='fontType' label='Font' options={[
-                        {value: '0', label: 'Blocko'},
-                        {value: '1', label: 'Bloco (big)'},
-                        {value: '2', label: 'Pebble fonts'},
-                        {value: '3', label: 'Archivo'},
-                        {value: '4', label: 'Din'},
-                        {value: '5', label: 'Prototype'}
-                    ]} selectedItem={state.fontType} onChange={this.onChangeDropdown.bind(this, 'fontType')}/>
+                    <DropdownField fieldName='fontType' label='Font' options={this.fonts} selectedItem={state.fontType} onChange={this.onChangeDropdown.bind(this, 'fontType')}/>
                     <ToggleField fieldName='leadingZero' label={this._('Hours with leading zero')} checked={state.leadingZero} onChange={this.onChange.bind(this, 'leadingZero')}/>
                     <ToggleField fieldName='bluetoothDisconnect' label={this._('Vibrate on Bluetooth disconnect')} checked={state.bluetoothDisconnect} onChange={this.onChange.bind(this, 'bluetoothDisconnect')}/>
                     <ToggleField fieldName='updates' label={this._('Check for updates')} checked={state.update} onChange={this.onChange.bind(this, 'update')} />
+
+                    {this.platform !== 'chalk' && this.plaform !== 'aplite' ?
+                        <Versioned minVersion="3.5" version={this.currentVersion}>
+                            <div>
+                                <ToggleField fieldName='quickview' label={this._('Enable Quickview mode')} checked={state.quickview} onChange={this.onChange.bind(this, 'quickview')} />
+                                <HelperText>{this._('Hides additional timezone and battery level and adjusts the layout when a timeline event is on the screen.')}</HelperText>
+                            </div>
+                        </Versioned>
+                    : null}
 
                     <DropdownField fieldName='timezones' label={this._('Additional Timezone')} options={this.timezones} searchable={true} clearable={false} selectedItem={state.timezones}  onChange={this.onChangeDropdown.bind(this, 'timezones')}/>
                 </OptionGroup>
 
                 <OptionGroup title={this._('Modules')}>
-                    <TabContainer tabs={getPlatform() === 'chalk' ? this.getEnabledModulesRound() : this.getEnabledModules()} />
-                    {getPlatform() !== 'aplite' ?
+                    <TabContainer tabs={this.platform === 'chalk' ? this.getEnabledModulesRound() : this.getEnabledModules()} />
+                    {this.platform !== 'aplite' ?
                         <div>
                             <ToggleField fieldName='showSleep' label={this._('Enable after wake up mode')} checked={state.showSleep} onChange={this.onChange.bind(this, 'showSleep')} />
                             <HelperText>{this._('If set, the watchface will show the modules under the \'Sleep\' tab from when you\'re asleep until half an hour after you wake up, switching back to the \'Default\' tab after that. This feature requires Pebble Health enabled.')}</HelperText>
@@ -579,13 +601,7 @@ class Layout extends Component {
                     <HelperText standalone={true}>{this._('Remember to save to apply your settings.')}</HelperText>
                     <HelperText standalone={true}>{this._('Fonts: <a href="http://www.dafont.com/blocko.font">Blocko</a>, <a href="https://fontlibrary.org/en/font/osp-din">OSP-DIN</a>, <a href="https://www.google.com/fonts/specimen/Archivo+Narrow">Archivo Narrow</a> and <a href="http://www.dafont.com/prototype.font">Prototype</a>.<br />Weather font used: <a href="https://erikflowers.github.io/weather-icons/">Erik Flower\'s Weather Icons</a>.')}</HelperText>
                     <HelperText standalone={true}>{this._('If you like Timeboxed, please consider donating ;)')}</HelperText>
-
-                    <form action='https://www.paypal.com/cgi-bin/webscr' method='post' target='_top'>
-                        <input type='hidden' name='cmd' value='_s-xclick' />
-                        <input type='hidden' name='encrypted' value='-----BEGIN PKCS7-----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-----END PKCS7-----' />
-                        <input type='submit' value={this._('Donate')} id='donateBtn' className='btn btn-success btn-sm btn--donate' />
-                        <img alt='' border='0' src='https://www.paypalobjects.com/en_US/i/scr/pixel.gif' width='1' height='1' />
-                    </form>
+                    <DonateButton />
 
                     <div className='block--submit'>
                         <button onClick={this.onSubmit} className='btn btn-primary btn-lg btn-submit'>{this._('Save settings')}</button>

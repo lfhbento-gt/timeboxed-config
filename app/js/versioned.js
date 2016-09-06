@@ -26,4 +26,6 @@ Versioned.defaultProps = {
 
 }
 
+export { shouldShow }
+
 export default Versioned

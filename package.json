@@ -4,7 +4,7 @@
   "description": "configuration page for the timeboxed watchface",
   "main": "index.js",
   "dependencies": {
-    "bootstrap": "^4.0.0-alpha.2",
+    "bootstrap": "4.0.0-alpha.4",
     "bootstrap-toggle": "^2.2.2",
     "classnames": "^2.2.3",
     "es6-promise": "^3.2.1",
@@ -12,7 +12,7 @@
     "jquery": "^2.2.3",
     "object-assign": "^4.1.0",
     "react": "^15.1.0",
-    "react-dom": "^15.0.1",
+    "react-dom": "^15.1.0",
     "react-fastclick": "^2.1.2",
     "react-fastclick-alt": "^1.0.1",
     "webpack": "^1.13.1"

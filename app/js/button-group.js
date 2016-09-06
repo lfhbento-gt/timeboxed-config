@@ -16,7 +16,7 @@ class RadioButtonGroup extends React.Component {
                     {
                         this.props.options.map((item, index) => {
                             let classes = {
-                                'btn btn-primary-outline': true,
+                                'btn btn-outline-primary': true,
                                 'active': this.state.selectedItem === item.value
                             };
                             if (this.props.size) {
