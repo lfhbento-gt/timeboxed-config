@@ -53,20 +53,11 @@ class Layout extends Component {
             showDebug: false,
         };
 
-        this.fonts = [
-            {value: '0', label: 'Blocko'},
-            {value: '1', label: 'Bloco (big)'},
-            {value: '2', label: 'Pebble fonts'},
-            {value: '3', label: 'Archivo'},
-            {value: '4', label: 'Din'},
-            {value: '5', label: 'Prototype'}
-        ];
-
         if (shouldShow(this.currentVersion, "3.5", null)) {
             this.defaultState = Object.assign({}, this.defaultState, {
                 quickview: true,
+                dateSeparator: '1',
             });
-            this.fonts.push({value: '6', label: 'LECO'})
         }
 
         this.defaultColors = {
@@ -234,6 +225,36 @@ class Layout extends Component {
             {value: '12', label: this._('Finnish')},
             {value: '13', label: this._('Slovak')},
         ];
+
+        this.fonts = [
+            {value: '0', label: 'Blocko'},
+            {value: '1', label: 'Bloco (big)'},
+            {value: '2', label: 'Pebble fonts'},
+            {value: '3', label: 'Archivo'},
+            {value: '4', label: 'Din'},
+            {value: '5', label: 'Prototype'}
+        ];
+
+        this.dateFormatOptions = [
+            {value: '0', label: this._('Day of week, month, day')},
+            {value: '1', label: this._('Day of week, day, month')},
+        ];
+
+        if (shouldShow(this.currentVersion, "3.5", null)) {
+            this.fonts = this.fonts.concat([
+                {value: '6', label: 'LECO'}
+            ]);
+
+            this.dateFormatOptions = this.dateFormatOptions.concat([
+                {value: '2', label: this._('Day of week, day')},
+                {value: '3', label: this._('Day, month')},
+                {value: '4', label: this._('Month, day')},
+                {value: '5', label: this._('Day, month (number)')},
+                {value: '6', label: this._('Month (number), day')},
+                {value: '7', label: this._('Day of week, day, month (number)')},
+                {value: '8', label: this._('Day of week, month (number), day')},
+            ]);
+        }
 
         this.weatherModules = ['1', '2', '8'];
         this.healthModules = ['3', '4', '5', '6', '7'];
@@ -480,10 +501,14 @@ class Layout extends Component {
 
                 <OptionGroup title={this._('Localization')}>
                     <DropdownField fieldName='locale' label={this._('Language')} options={this.locales} searchable={true} clearable={false} selectedItem={state.locale} onChange={this.onChangeDropdown.bind(this, 'locale')}/>
-                    <DropdownField fieldName='dateFormat' label={this._('Date format')} options={[
-                        {value: '0', label: this._('Day of week, month, day')},
-                        {value: '1', label: this._('Day of week, day, month')},
-                    ]} searchable={false} clearable={false} selectedItem={state.dateFormat} onChange={this.onChangeDropdown.bind(this, 'dateFormat')}/>
+                    <DropdownField fieldName='dateFormat' label={this._('Date format')} options={this.dateFormatOptions} searchable={false} clearable={false} selectedItem={state.dateFormat} onChange={this.onChangeDropdown.bind(this, 'dateFormat')}/>
+                    <Versioned minVersion="3.5" version={this.currentVersion}>
+                        <RadioButtonGroup fieldName='dateSeparator' label='Date separator' options={[
+                            {value: '0', label: this._('(space)')},
+                            {value: '1', label: this._('.')},
+                            {value: '2', label: this._('/')},
+                        ]} selectedItem={state.dateSeparator} onChange={this.onChange.bind(this, 'dateSeparator')}/>
+                    </Versioned>
                 </OptionGroup>
 
                 <OptionGroup title={this._('Colors')}>
