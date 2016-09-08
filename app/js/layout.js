@@ -242,7 +242,8 @@ class Layout extends Component {
 
         if (shouldShow(this.currentVersion, "3.5", null)) {
             this.fonts = this.fonts.concat([
-                {value: '6', label: 'LECO'}
+                {value: '6', label: 'LECO'},
+                {value: '7', label: 'Konstruct'},
             ]);
 
             this.dateFormatOptions = this.dateFormatOptions.concat([
