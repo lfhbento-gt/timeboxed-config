@@ -85,6 +85,8 @@ class Layout extends Component {
             deepBehindColor: '#FFFFFF',
             windDirColor: '#FFFFFF',
             windSpeedColor: '#FFFFFF',
+            sunriseColor: '#FFFFFF',
+            sunsetColor: '#FFFFFF',
         };
 
         this.ignoreKeys = [
@@ -134,8 +136,6 @@ class Layout extends Component {
             {value: '2', label: this._('Min/Max Temp')},
             {value: '8', label: this._('Wind dir./speed')},
         ];
-
-        this.modules = this.platform === 'aplite' ? this.modulesAplite : this.modulesAll;
 
         this.timezones = [
             {value: '#|0:00', label: 'None'},
@@ -240,6 +240,9 @@ class Layout extends Component {
             {value: '1', label: this._('Day of week, day, month')},
         ];
 
+        this.weatherModules = ['1', '2', '8'];
+        this.healthModules = ['3', '4', '5', '6', '7'];
+
         if (shouldShow(this.currentVersion, "3.5", null)) {
             this.fonts = this.fonts.concat([
                 {value: '6', label: 'LECO'},
@@ -255,10 +258,21 @@ class Layout extends Component {
                 {value: '7', label: this._('Day of week, day, month (number)')},
                 {value: '8', label: this._('Day of week, month (number), day')},
             ]);
+
+            this.modulesAll = this.modulesAll.concat([
+                {value: '11', label: this._('Sunrise')},
+                {value: '12', label: this._('Sunset')},
+            ]);
+
+            this.modulesAplite = this.modulesAplite.concat([
+                {value: '11', label: this._('Sunrise')},
+                {value: '12', label: this._('Sunset')},
+            ]);
+
+            this.weatherModules = this.weatherModules.concat(['11', '12']);
         }
 
-        this.weatherModules = ['1', '2', '8'];
-        this.healthModules = ['3', '4', '5', '6', '7'];
+        this.modules = this.platform === 'aplite' ? this.modulesAplite : this.modulesAll;
     }
 
     filterValidKeys(data, keys, invert = false) {
@@ -565,6 +579,12 @@ class Layout extends Component {
                                 <ColorPicker
                                     fieldName='windSpeedColor' label={this._('Wind direction/speed')} color={state.windDirColor} onChange={this.onChange.bind(this, 'windDirColor')}
                                     secondColor={state.windSpeedColor} onSecondColorChange={this.onChange.bind(this, 'windSpeedColor')} />
+                            : null}
+                            {this.isEnabled(['11']) ?
+                                <ColorPicker fieldName='sunriseColor' label={this._('Sunrise')} color={state.sunriseColor} onChange={this.onChange.bind(this, 'sunriseColor')} />
+                            : null}
+                            {this.isEnabled(['12']) ?
+                                <ColorPicker fieldName='sunsetColor' label={this._('Sunset')} color={state.sunsetColor} onChange={this.onChange.bind(this, 'sunsetColor')} />
                             : null}
                         </div>
                     : null}
