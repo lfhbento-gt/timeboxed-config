@@ -32,6 +32,8 @@ class ColorPresets extends Component {
                 deepBehindColor: '#FFFFFF',
                 windDirColor: '#FFFFFF',
                 windSpeedColor: '#FFFFFF',
+                sunriseColor: '#FFFFFF',
+                sunsetColor: '#FFFFFF',
             },
             'Colorful': {
                 bgColor: '#000055',
@@ -58,6 +60,8 @@ class ColorPresets extends Component {
                 deepBehindColor: '#FFFF00',
                 windDirColor: '#55FF00',
                 windSpeedColor: '#55FF00',
+                sunriseColor: '#FFFF00',
+                sunsetColor: '#FFAA00',
             },
         }
 
