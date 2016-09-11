@@ -581,12 +581,14 @@ class Layout extends Component {
                                     secondColor={state.windSpeedColor} onSecondColorChange={this.onChange.bind(this, 'windSpeedColor')} />
                             : null}
                             <Versioned minVersion="3.5" version={this.currentVersion}>
-                                {this.isEnabled(['11']) ?
-                                    <ColorPicker fieldName='sunriseColor' label={this._('Sunrise')} color={state.sunriseColor} onChange={this.onChange.bind(this, 'sunriseColor')} />
-                                : null}
-                                {this.isEnabled(['12']) ?
-                                    <ColorPicker fieldName='sunsetColor' label={this._('Sunset')} color={state.sunsetColor} onChange={this.onChange.bind(this, 'sunsetColor')} />
-                                : null}
+                                <div>
+                                    {this.isEnabled(['11']) ?
+                                        <ColorPicker fieldName='sunriseColor' label={this._('Sunrise')} color={state.sunriseColor} onChange={this.onChange.bind(this, 'sunriseColor')} />
+                                    : null}
+                                    {this.isEnabled(['12']) ?
+                                        <ColorPicker fieldName='sunsetColor' label={this._('Sunset')} color={state.sunsetColor} onChange={this.onChange.bind(this, 'sunsetColor')} />
+                                    : null}
+                                </div>
                             </Versioned>
                         </div>
                     : null}
