@@ -14,8 +14,8 @@ const isNewer = (a, b) => {
 
 const Versioned = (props) => {
     return (shouldShow(props.version, props.minVersion, props.maxVersion) ?
-        props.children
-    : null);
+        <div>{props.children}</div>
+        : null);
 };
 
 Versioned.propTypes = {

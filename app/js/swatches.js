@@ -56,7 +56,7 @@ class Swatches extends Component {
     render() {
         return (
             <div className='color-panel--swatches'>
-                {getPlatform() === 'aplite' ? 
+                {getPlatform() === 'aplite' || getPlatform() === 'diorite' ?
                     <SwatchRows colors={this.bwColors} onColorChange={this.props.onColorChange} />
                 : <div>
                     <RadioButtonGroup fieldName='colorType' size='small' options={[

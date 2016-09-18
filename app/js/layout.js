@@ -53,13 +53,6 @@ class Layout extends Component {
             showDebug: false,
         };
 
-        if (shouldShow(this.currentVersion, "3.5", null)) {
-            this.defaultState = Object.assign({}, this.defaultState, {
-                quickview: true,
-                dateSeparator: '1',
-            });
-        }
-
         this.defaultColors = {
             bgColor: '#000000',
             hoursColor: '#FFFFFF',
@@ -85,9 +78,24 @@ class Layout extends Component {
             deepBehindColor: '#FFFFFF',
             windDirColor: '#FFFFFF',
             windSpeedColor: '#FFFFFF',
-            sunriseColor: '#FFFFFF',
-            sunsetColor: '#FFFFFF',
         };
+
+        if (shouldShow(this.currentVersion, "3.5", null)) {
+            this.defaultState = Object.assign({}, this.defaultState, {
+                quickview: true,
+                dateSeparator: '1',
+            });
+            this.defaultColors = Object.assign({}, this.defaultColors, {
+                sunriseColor: '#FFFFFF',
+                sunsetColor: '#FFFFFF',
+            });
+        }
+        if (shouldShow(this.currentVersion, "3.7", null)) {
+            this.defaultColors = Object.assign({}, this.defaultColors, {
+                activeColor: '#FFFFFF',
+                activeBehindColor: '#FFFFFF',
+            });
+        }
 
         this.ignoreKeys = [
             'showDebug',
@@ -270,6 +278,13 @@ class Layout extends Component {
             ]);
 
             this.weatherModules = this.weatherModules.concat(['11', '12']);
+        }
+
+        if (shouldShow(this.currentVersion, "3.7", null)) {
+            this.modulesAll = this.modulesAll.concat([
+                {value: '13', label: this._('Active time')},
+            ]);
+            this.healthModules.push('13');
         }
 
         this.modules = this.platform === 'aplite' ? this.modulesAplite : this.modulesAll;
@@ -581,14 +596,19 @@ class Layout extends Component {
                                     secondColor={state.windSpeedColor} onSecondColorChange={this.onChange.bind(this, 'windSpeedColor')} />
                             : null}
                             <Versioned minVersion="3.5" version={this.currentVersion}>
-                                <div>
-                                    {this.isEnabled(['11']) ?
-                                        <ColorPicker fieldName='sunriseColor' label={this._('Sunrise')} color={state.sunriseColor} onChange={this.onChange.bind(this, 'sunriseColor')} />
-                                    : null}
-                                    {this.isEnabled(['12']) ?
-                                        <ColorPicker fieldName='sunsetColor' label={this._('Sunset')} color={state.sunsetColor} onChange={this.onChange.bind(this, 'sunsetColor')} />
-                                    : null}
-                                </div>
+                                {this.isEnabled(['11']) ?
+                                    <ColorPicker fieldName='sunriseColor' label={this._('Sunrise')} color={state.sunriseColor} onChange={this.onChange.bind(this, 'sunriseColor')} />
+                                : null}
+                                {this.isEnabled(['12']) ?
+                                    <ColorPicker fieldName='sunsetColor' label={this._('Sunset')} color={state.sunsetColor} onChange={this.onChange.bind(this, 'sunsetColor')} />
+                                : null}
+                            </Versioned>
+                            <Versioned minVersion="3.7" version={this.currentVersion}>
+                                {this.isEnabled(['13']) ?
+                                    <ColorPicker
+                                        fieldName='activeColor' label={this._('Active time/falling behind')} color={state.activeColor} onChange={this.onChange.bind(this, 'activeColor')}
+                                        secondColor={state.activeBehindColor} onSecondColorChange={this.onChange.bind(this, 'activeBehindColor')} />
+                                : null}
                             </Versioned>
                         </div>
                     : null}
