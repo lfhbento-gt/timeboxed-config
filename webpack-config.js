@@ -19,7 +19,8 @@ var config = {
         new HtmlWebpackPlugin({
             title: 'Timeboxed',
             template: 'index.html',
-            inject: 'body'
+            inject: 'body',
+            hash: true
         }),
         new webpack.ProvidePlugin({
             $: "jquery",

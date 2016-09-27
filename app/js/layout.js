@@ -51,6 +51,8 @@ class Layout extends Component {
             forecastKey: '',
             speedUnit: '0',
             showDebug: false,
+            quickview: true,
+            dateSeparator: '1',
         };
 
         this.defaultColors = {
@@ -78,22 +80,25 @@ class Layout extends Component {
             deepBehindColor: '#FFFFFF',
             windDirColor: '#FFFFFF',
             windSpeedColor: '#FFFFFF',
+            sunriseColor: '#FFFFFF',
+            sunsetColor: '#FFFFFF',
         };
 
-        if (shouldShow(this.currentVersion, "3.5", null)) {
-            this.defaultState = Object.assign({}, this.defaultState, {
-                quickview: true,
-                dateSeparator: '1',
-            });
-            this.defaultColors = Object.assign({}, this.defaultColors, {
-                sunriseColor: '#FFFFFF',
-                sunsetColor: '#FFFFFF',
-            });
-        }
         if (shouldShow(this.currentVersion, "3.7", null)) {
             this.defaultColors = Object.assign({}, this.defaultColors, {
                 activeColor: '#FFFFFF',
                 activeBehindColor: '#FFFFFF',
+            });
+        }
+        if (shouldShow(this.currentVersion, "4.0", null)) {
+            this.defaultState = Object.assign({}, this.defaultState, {
+                showTap: false,
+                tapTime: '7',
+                tapSlotA: '11',
+                tapSlotB: '12',
+                tapSlotC: '8',
+                tapSlotD: '13',
+                weatherTime: '30',
             });
         }
 
@@ -117,6 +122,12 @@ class Layout extends Component {
             'sleepSlotC',
             'sleepSlotD',
         ];
+        this.moduleTapStateKeys = [
+            'tapSlotA',
+            'tapSlotB',
+            'tapSlotC',
+            'tapSlotD',
+        ];
 
         this.state = Object.assign({}, this.defaultState, this.defaultColors, newState);
         this.onPresetSelect = this.onPresetSelect.bind(this);
@@ -136,6 +147,8 @@ class Layout extends Component {
             {value: '6', label: this._('Sleep Time')},
             {value: '7', label: this._('Deep Sleep Time')},
             {value: '8', label: this._('Wind dir./speed')},
+            {value: '11', label: this._('Sunrise')},
+            {value: '12', label: this._('Sunset')},
         ];
         
         this.modulesAplite = [
@@ -143,6 +156,8 @@ class Layout extends Component {
             {value: '1', label: this._('Current Weather')},
             {value: '2', label: this._('Min/Max Temp')},
             {value: '8', label: this._('Wind dir./speed')},
+            {value: '11', label: this._('Sunrise')},
+            {value: '12', label: this._('Sunset')},
         ];
 
         this.timezones = [
@@ -240,45 +255,26 @@ class Layout extends Component {
             {value: '2', label: 'Pebble fonts'},
             {value: '3', label: 'Archivo'},
             {value: '4', label: 'Din'},
-            {value: '5', label: 'Prototype'}
+            {value: '5', label: 'Prototype'},
+            {value: '6', label: 'LECO'},
+            {value: '7', label: 'Konstruct'},
         ];
 
         this.dateFormatOptions = [
             {value: '0', label: this._('Day of week, month, day')},
             {value: '1', label: this._('Day of week, day, month')},
+            {value: '2', label: this._('Day of week, day')},
+            {value: '3', label: this._('Day, month')},
+            {value: '4', label: this._('Month, day')},
+            {value: '5', label: this._('Day, month (number)')},
+            {value: '6', label: this._('Month (number), day')},
+            {value: '7', label: this._('Day of week, day, month (number)')},
+            {value: '8', label: this._('Day of week, month (number), day')},
         ];
 
-        this.weatherModules = ['1', '2', '8'];
+        this.weatherModules = ['1', '2', '8', '11', '12'];
         this.healthModules = ['3', '4', '5', '6', '7'];
 
-        if (shouldShow(this.currentVersion, "3.5", null)) {
-            this.fonts = this.fonts.concat([
-                {value: '6', label: 'LECO'},
-                {value: '7', label: 'Konstruct'},
-            ]);
-
-            this.dateFormatOptions = this.dateFormatOptions.concat([
-                {value: '2', label: this._('Day of week, day')},
-                {value: '3', label: this._('Day, month')},
-                {value: '4', label: this._('Month, day')},
-                {value: '5', label: this._('Day, month (number)')},
-                {value: '6', label: this._('Month (number), day')},
-                {value: '7', label: this._('Day of week, day, month (number)')},
-                {value: '8', label: this._('Day of week, month (number), day')},
-            ]);
-
-            this.modulesAll = this.modulesAll.concat([
-                {value: '11', label: this._('Sunrise')},
-                {value: '12', label: this._('Sunset')},
-            ]);
-
-            this.modulesAplite = this.modulesAplite.concat([
-                {value: '11', label: this._('Sunrise')},
-                {value: '12', label: this._('Sunset')},
-            ]);
-
-            this.weatherModules = this.weatherModules.concat(['11', '12']);
-        }
 
         if (shouldShow(this.currentVersion, "3.7", null)) {
             this.modulesAll = this.modulesAll.concat([
@@ -361,7 +357,8 @@ class Layout extends Component {
     isEnabled(moduleIndexes) {
         return (
             this.moduleStateKeys.some(key => moduleIndexes.indexOf(this.state[key]) !== -1) ||
-            (this.state.showSleep && this.moduleSleepStateKeys.some(key => moduleIndexes.indexOf(this.state[key]) !== -1))
+            (this.state.showSleep && this.moduleSleepStateKeys.some(key => moduleIndexes.indexOf(this.state[key]) !== -1)) ||
+            (this.state.showTap && this.moduleTapStateKeys.some(key => moduleIndexes.indexOf(this.state[key]) !== -1))
         )
     }
 
@@ -425,6 +422,29 @@ class Layout extends Component {
                 </div>
             );
         }
+        
+        if (state.showTap) {
+            modules['Tap'] = (
+                <div>
+                    <SideBySideFields>
+                        <DropdownField fieldName='top-left-tap' label={this._('Top Left')} options={this.modules}
+                            searchable={false} clearable={false} labelPosition='top'
+                            selectedItem={state.tapSlotA} onChange={this.onChangeDropdown.bind(this, 'tapSlotA')}/>
+                        <DropdownField fieldName='top-right-tap' label={this._('Top Right')} options={this.modules}
+                            searchable={false} clearable={false} labelPosition='top'
+                            selectedItem={state.tapSlotB} onChange={this.onChangeDropdown.bind(this, 'tapSlotB')}/>
+                    </SideBySideFields>
+                    <SideBySideFields>
+                        <DropdownField fieldName='bottom-left-tap' label={this._('Bottom Left')} options={this.modules}
+                            searchable={false} clearable={false} labelPosition='bottom'
+                            selectedItem={state.tapSlotC} onChange={this.onChangeDropdown.bind(this, 'tapSlotC')}/>
+                        <DropdownField fieldName='bottom-right-tap' label={this._('Bottom Right')} options={this.modules}
+                            searchable={false} clearable={false} labelPosition='bottom'
+                            selectedItem={state.tapSlotD} onChange={this.onChangeDropdown.bind(this, 'tapSlotD')}/>
+                    </SideBySideFields>
+                </div>
+            );
+        }
 
         return modules;
     }
@@ -469,6 +489,25 @@ class Layout extends Component {
             );
         }
 
+        if (state.showTap) {
+            modules['Tap'] = (
+                <div>
+                    <DropdownField fieldName='top-left-tap' label={this._('Top 1')} options={this.modules}
+                        searchable={false} clearable={false} 
+                        selectedItem={state.tapSlotA} onChange={this.onChangeDropdown.bind(this, 'tapSlotA')}/>
+                    <DropdownField fieldName='top-right-tap' label={this._('Top 2')} options={this.modules}
+                        searchable={false} clearable={false}
+                        selectedItem={state.tapSlotB} onChange={this.onChangeDropdown.bind(this, 'tapSlotB')}/>
+                    <DropdownField fieldName='bottom-left-tap' label={this._('Bottom 1')} options={this.modules}
+                        searchable={false} clearable={false}
+                        selectedItem={state.tapSlotC} onChange={this.onChangeDropdown.bind(this, 'tapSlotC')}/>
+                    <DropdownField fieldName='bottom-right-tap' label={this._('Bottom 2')} options={this.modules}
+                        searchable={false} clearable={false}
+                        selectedItem={state.tapSlotD} onChange={this.onChangeDropdown.bind(this, 'tapSlotD')}/>
+                </div>
+            );
+        }
+
         return modules;
     }
 
@@ -508,12 +547,10 @@ class Layout extends Component {
                     <ToggleField fieldName='updates' label={this._('Check for updates')} checked={state.update} onChange={this.onChange.bind(this, 'update')} />
 
                     {this.platform !== 'chalk' && this.plaform !== 'aplite' ?
-                        <Versioned minVersion="3.5" version={this.currentVersion}>
-                            <div>
-                                <ToggleField fieldName='quickview' label={this._('Enable Quickview mode')} checked={state.quickview} onChange={this.onChange.bind(this, 'quickview')} />
-                                <HelperText>{this._('Hides additional timezone and battery level and adjusts the layout when a timeline event is on the screen.')}</HelperText>
-                            </div>
-                        </Versioned>
+                        <div>
+                            <ToggleField fieldName='quickview' label={this._('Enable Quickview mode')} checked={state.quickview} onChange={this.onChange.bind(this, 'quickview')} />
+                            <HelperText>{this._('Hides additional timezone and battery level and adjusts the layout when a timeline event is on the screen.')}</HelperText>
+                        </div>
                     : null}
 
                     <DropdownField fieldName='timezones' label={this._('Additional Timezone')} options={this.timezones} searchable={true} clearable={false} selectedItem={state.timezones}  onChange={this.onChangeDropdown.bind(this, 'timezones')}/>
@@ -527,6 +564,19 @@ class Layout extends Component {
                             <HelperText>{this._('If set, the watchface will show the modules under the \'Sleep\' tab from when you\'re asleep until half an hour after you wake up, switching back to the \'Default\' tab after that. This feature requires Pebble Health enabled.')}</HelperText>
                         </div>
                     : null}
+                    <Versioned minVersion="4.0" version={this.currentVersion}>
+                        <div>
+                            <ToggleField fieldName='showTap' label={this._('Enable tap mode')} checked={state.showTap} onChange={this.onChange.bind(this, 'showTap')} />
+                            <HelperText>{this._('<strong>Experimental feature:</strong> If set, the watchface will show the modules under the \'Tap\' tab when you tap the watch for the amount of time selected below, switching back to the \'Default\' tab after that.')}</HelperText>
+                            {this.state.showTap ?
+                                <RadioButtonGroup fieldName='tapTime' label='Tap mode duration' options={[
+                                    {value: '5', label: this._('5s')},
+                                    {value: '7', label: this._('7s')},
+                                    {value: '10', label: this._('10s')},
+                                ]} selectedItem={state.tapTime} onChange={this.onChange.bind(this, 'tapTime')}/>
+                            : null}
+                        </div>
+                    </Versioned>
                 </OptionGroup>
 
                 <OptionGroup title={this._('Localization')}>
@@ -595,14 +645,12 @@ class Layout extends Component {
                                     fieldName='windSpeedColor' label={this._('Wind direction/speed')} color={state.windDirColor} onChange={this.onChange.bind(this, 'windDirColor')}
                                     secondColor={state.windSpeedColor} onSecondColorChange={this.onChange.bind(this, 'windSpeedColor')} />
                             : null}
-                            <Versioned minVersion="3.5" version={this.currentVersion}>
-                                {this.isEnabled(['11']) ?
-                                    <ColorPicker fieldName='sunriseColor' label={this._('Sunrise')} color={state.sunriseColor} onChange={this.onChange.bind(this, 'sunriseColor')} />
-                                : null}
-                                {this.isEnabled(['12']) ?
-                                    <ColorPicker fieldName='sunsetColor' label={this._('Sunset')} color={state.sunsetColor} onChange={this.onChange.bind(this, 'sunsetColor')} />
-                                : null}
-                            </Versioned>
+                            {this.isEnabled(['11']) ?
+                                <ColorPicker fieldName='sunriseColor' label={this._('Sunrise')} color={state.sunriseColor} onChange={this.onChange.bind(this, 'sunriseColor')} />
+                            : null}
+                            {this.isEnabled(['12']) ?
+                                <ColorPicker fieldName='sunsetColor' label={this._('Sunset')} color={state.sunsetColor} onChange={this.onChange.bind(this, 'sunsetColor')} />
+                            : null}
                             <Versioned minVersion="3.7" version={this.currentVersion}>
                                 {this.isEnabled(['13']) ?
                                     <ColorPicker
@@ -651,6 +699,17 @@ class Layout extends Component {
                         {this.isEnabled(['1', '2']) ?
                             <ToggleField fieldName='useCelsius' label={this._('Use Celsius')} checked={state.useCelsius} onChange={this.onChange.bind(this, 'useCelsius')} />
                         : null}
+
+                        <Versioned minVersion="4.0" version={this.currentVersion}>
+                            {this.isEnabled(['1', '2', '8', '11', '12']) ?
+                                <RadioButtonGroup fieldName='weatherTime' label={this._('Weather refresh interval')} options={[
+                                    {value: '10', label: '10min'},
+                                    {value: '15', label: '15min'},
+                                    {value: '30', label: '30min'},
+                                ]} selectedItem={state.weatherTime} onChange={this.onChange.bind(this, 'weatherTime')}/>
+                            : null}
+                        </Versioned>
+
                         {this.isEnabled(['8']) ?
                             <RadioButtonGroup fieldName='speedUnit' label={this._('Speed unit')} options={[
                                 {value: '0', label: 'mph'},
@@ -658,6 +717,7 @@ class Layout extends Component {
                                 {value: '2', label: 'knots'},
                             ]} selectedItem={state.speedUnit} onChange={this.onChange.bind(this, 'speedUnit')}/>
                         : null}
+
                         <TextField fieldName='overrideLocation' buttonLabel={this._('Verify')}
                             label={this._('Manual Location')} labelPosition='top'
                             value={state.overrideLocation}
