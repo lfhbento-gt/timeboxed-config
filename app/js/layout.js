@@ -99,6 +99,12 @@ class Layout extends Component {
                 tapSlotC: '8',
                 tapSlotD: '13',
                 weatherTime: '30',
+                heartLow: '0',
+                heartHigh: '0',
+            });
+            this.defaultColors = Object.assign({}, this.defaultColors, {
+                heartColor: '#FFFFFF',
+                heartColorOff: '#FFFFFF',
             });
         }
 
@@ -282,6 +288,12 @@ class Layout extends Component {
             ]);
             this.healthModules.push('13');
         }
+        if (shouldShow(this.currentVersion, "4.0", null)) {
+            this.modulesAll = this.modulesAll.concat([
+                {value: '14', label: this._('Heart rate')},
+            ]);
+            this.healthModules.push('14');
+        }
 
         this.modules = this.platform === 'aplite' ? this.modulesAplite : this.modulesAll;
     }
@@ -333,6 +345,16 @@ class Layout extends Component {
         if ((this.weatherProviderSelected('1') && !this.state.weatherKey) ||
                 (this.weatherProviderSelected('3') && !this.state.forecastKey)) {
             alert(this._('Please enter a valid API key for the selected provider'));
+            return;
+        }
+
+        if (this.state.heartHigh && isNaN(this.state.heartHigh)) {
+            alert(this._('Value for high heart rate limit should be a number'));
+            return;
+        }
+
+        if (this.state.heartLow && isNaN(this.state.heartLow)) {
+            alert(this._('Value for low heart rate limit should be a number'));
             return;
         }
 
@@ -658,6 +680,13 @@ class Layout extends Component {
                                         secondColor={state.activeBehindColor} onSecondColorChange={this.onChange.bind(this, 'activeBehindColor')} />
                                 : null}
                             </Versioned>
+                            <Versioned minVersion="4.0" version={this.currentVersion}>
+                                {this.isEnabled(['14']) ?
+                                    <ColorPicker
+                                        fieldName='heartColor' label={this._('Heart rate/off target')} color={state.heartColor} onChange={this.onChange.bind(this, 'heartColor')}
+                                        secondColor={state.heartColorOff} onSecondColorChange={this.onChange.bind(this, 'heartColorOff')} />
+                                : null}
+                            </Versioned>
                         </div>
                     : null}
                 </OptionGroup>
@@ -667,6 +696,22 @@ class Layout extends Component {
                         <ColorPresets colors={this.getCurrentColors()} onSelect={this.onPresetSelect}/>
                     </OptionGroup>
                 : null}
+
+                <Versioned minVersion="4.0" version={this.currentVersion}>
+                    {this.isEnabled(['14']) ?
+                        <OptionGroup title={this._('Health')}>
+                            <TextField fieldName='heartLow'
+                                label={this._('Lower heart rate limit')}
+                                value={state.heartLow}
+                                onChange={this.onChange.bind(this, 'heartLow')}/> 
+                            <TextField fieldName='heartHigh'
+                                label={this._('Upper heart rate limit')}
+                                value={state.heartHigh}
+                                onChange={this.onChange.bind(this, 'heartHigh')}/>
+                            <HelperText>{this._('If any of the values are set and different than zero we\'ll show the heart rate in a different color when it\'s below the lower threshold or above the upper threshold.')}</HelperText>
+                        </OptionGroup>
+                    : null}
+                </Versioned>
 
                 {this.isWeatherEnabled() ?
                     <OptionGroup title={this._('Weather')}>
@@ -692,7 +737,7 @@ class Layout extends Component {
                                     label={this._('API Key')}
                                     value={state.forecastKey}
                                     onChange={this.onChange.bind(this, 'forecastKey')}/> 
-                                <HelperText>{this._('<strong>Note:</strong> For Dark Sky/Forecast.io, you need an API key. Go to <a href="https://developer.forecast.io/">developer.forecast.io/</a> to create a free account and get a key and insert it above.')}</HelperText>
+                                <HelperText>{this._('<strong>Note:</strong> For Dark Sky/Forecast.io, you need an API key. Go to <a href="https://darksky.net/dev/">darksky.net/dev/</a> to create a free account and get a key and insert it above.')}</HelperText>
                             </div>
                         : null}
 

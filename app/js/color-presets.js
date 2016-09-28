@@ -34,6 +34,8 @@ class ColorPresets extends Component {
                 deepBehindColor: '#FFFFFF',
                 windDirColor: '#FFFFFF',
                 windSpeedColor: '#FFFFFF',
+                sunriseColor: '#FFFFFF',
+                sunsetColor: '#FFFFFF',
             },
             'Colorful': {
                 bgColor: '#000055',
@@ -60,18 +62,9 @@ class ColorPresets extends Component {
                 deepBehindColor: '#FFFF00',
                 windDirColor: '#55FF00',
                 windSpeedColor: '#55FF00',
-            },
-        }
-
-        if (shouldShow(getCurrentVersion(), "3.5", null)) {
-            this.defaultPresets['Black and white'] = Object.assign({}, this.defaultPresets['Black and white'], {
-                sunriseColor: '#FFFFFF',
-                sunsetColor: '#FFFFFF',
-            });
-            this.defaultPresets['Colorful'] = Object.assign({}, this.defaultPresets['Colorful'], {
                 sunriseColor: '#FFFF00',
                 sunsetColor: '#FFAA00',
-            });
+            },
         }
 
         if (shouldShow(getCurrentVersion(), "3.7", null)) {
@@ -82,6 +75,17 @@ class ColorPresets extends Component {
             this.defaultPresets['Colorful'] = Object.assign({}, this.defaultPresets['Colorful'], {
                 activeColor: '#AAFFFF',
                 activeBehindColor: '#FFFF00',
+            });
+        }
+
+        if (shouldShow(getCurrentVersion(), "4.0", null)) {
+            this.defaultPresets['Black and white'] = Object.assign({}, this.defaultPresets['Black and white'], {
+                heartColor: '#FFFFFF',
+                heartColorOff: '#FFFFFF',
+            });
+            this.defaultPresets['Colorful'] = Object.assign({}, this.defaultPresets['Colorful'], {
+                heartColor: '#AAFFFF',
+                heartColorOff: '#FFFF00',
             });
         }
 
