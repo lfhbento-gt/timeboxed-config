@@ -105,6 +105,7 @@ class Layout extends Component {
             this.defaultColors = Object.assign({}, this.defaultColors, {
                 heartColor: '#FFFFFF',
                 heartColorOff: '#FFFFFF',
+                compassColor: '#FFFFFF',
             });
         }
 
@@ -291,8 +292,10 @@ class Layout extends Component {
         if (shouldShow(this.currentVersion, "4.0", null)) {
             this.modulesAll = this.modulesAll.concat([
                 {value: '14', label: this._('Heart rate')},
+                {value: '15', label: this._('Compass')},
             ]);
             this.healthModules.push('14');
+            this.dateFormatOptions.push({value: '9', label: this._('ISO-8601 (year, month, day)')})
         }
 
         this.modules = this.platform === 'aplite' ? this.modulesAplite : this.modulesAll;
@@ -380,6 +383,12 @@ class Layout extends Component {
         return (
             this.moduleStateKeys.some(key => moduleIndexes.indexOf(this.state[key]) !== -1) ||
             (this.state.showSleep && this.moduleSleepStateKeys.some(key => moduleIndexes.indexOf(this.state[key]) !== -1)) ||
+            (this.state.showTap && this.moduleTapStateKeys.some(key => moduleIndexes.indexOf(this.state[key]) !== -1))
+        )
+    }
+
+    isEnabledTap(moduleIndexes) {
+        return (
             (this.state.showTap && this.moduleTapStateKeys.some(key => moduleIndexes.indexOf(this.state[key]) !== -1))
         )
     }
@@ -580,6 +589,9 @@ class Layout extends Component {
 
                 <OptionGroup title={this._('Modules')}>
                     <TabContainer tabs={this.platform === 'chalk' ? this.getEnabledModulesRound() : this.getEnabledModules()} />
+                    {this.isEnabled(['15']) && !this.isEnabledTap(['15']) ?
+                        <HelperText standalone={true}>{this._('<strong>Alert:</strong> Keeping the compass enabled all the time could drain battery faster. It\'s recommend setting it as a \'Tap\' module (enable tap mode below).')}</HelperText>
+                    : null}
                     {this.platform !== 'aplite' ?
                         <div>
                             <ToggleField fieldName='showSleep' label={this._('Enable after wake up mode')} checked={state.showSleep} onChange={this.onChange.bind(this, 'showSleep')} />
@@ -587,28 +599,34 @@ class Layout extends Component {
                         </div>
                     : null}
                     <Versioned minVersion="4.0" version={this.currentVersion}>
-                        <div>
-                            <ToggleField fieldName='showTap' label={this._('Enable tap mode')} checked={state.showTap} onChange={this.onChange.bind(this, 'showTap')} />
-                            <HelperText>{this._('<strong>Experimental feature:</strong> If set, the watchface will show the modules under the \'Tap\' tab when you tap the watch for the amount of time selected below, switching back to the \'Default\' tab after that.')}</HelperText>
-                            {this.state.showTap ?
-                                <RadioButtonGroup fieldName='tapTime' label='Tap mode duration' options={[
-                                    {value: '5', label: this._('5s')},
-                                    {value: '7', label: this._('7s')},
-                                    {value: '10', label: this._('10s')},
-                                ]} selectedItem={state.tapTime} onChange={this.onChange.bind(this, 'tapTime')}/>
-                            : null}
-                        </div>
+                        <ToggleField fieldName='showTap' label={this._('Enable tap mode')} checked={state.showTap} onChange={this.onChange.bind(this, 'showTap')} />
+                        <HelperText>{this._('<strong>Experimental feature:</strong> If set, the watchface will show the modules under the \'Tap\' tab for the amount of time selected below when you tap the watch screen, switching back to the previous view after that. Keep in mind that tap detection is a bit rudimentary because of pebble\'s accelerometer, so light taps might not work. Enabling this feature might drain the battery a bit faster than usual.')}</HelperText>
+                        {this.state.showTap ?
+                            <RadioButtonGroup fieldName='tapTime' label='Tap mode duration' options={[
+                                {value: '5', label: this._('5s')},
+                                {value: '7', label: this._('7s')},
+                                {value: '10', label: this._('10s')},
+                            ]} selectedItem={state.tapTime} onChange={this.onChange.bind(this, 'tapTime')}/>
+                        : null}
                     </Versioned>
                 </OptionGroup>
 
                 <OptionGroup title={this._('Localization')}>
                     <DropdownField fieldName='locale' label={this._('Language')} options={this.locales} searchable={true} clearable={false} selectedItem={state.locale} onChange={this.onChangeDropdown.bind(this, 'locale')}/>
                     <DropdownField fieldName='dateFormat' label={this._('Date format')} options={this.dateFormatOptions} searchable={false} clearable={false} selectedItem={state.dateFormat} onChange={this.onChangeDropdown.bind(this, 'dateFormat')}/>
-                    <Versioned minVersion="3.5" version={this.currentVersion}>
+                    <Versioned maxVersion="3.8" version={this.currentVersion}>
                         <RadioButtonGroup fieldName='dateSeparator' label='Date separator' options={[
                             {value: '0', label: this._('(space)')},
                             {value: '1', label: this._('.')},
                             {value: '2', label: this._('/')},
+                        ]} selectedItem={state.dateSeparator} onChange={this.onChange.bind(this, 'dateSeparator')}/>
+                    </Versioned>
+                    <Versioned maxVersion="4.0" version={this.currentVersion}>
+                        <RadioButtonGroup fieldName='dateSeparator' label='Date separator' options={[
+                            {value: '0', label: this._('(space)')},
+                            {value: '1', label: this._('.')},
+                            {value: '2', label: this._('/')},
+                            {value: '3', label: this._('-')},
                         ]} selectedItem={state.dateSeparator} onChange={this.onChange.bind(this, 'dateSeparator')}/>
                     </Versioned>
                 </OptionGroup>
@@ -682,9 +700,15 @@ class Layout extends Component {
                             </Versioned>
                             <Versioned minVersion="4.0" version={this.currentVersion}>
                                 {this.isEnabled(['14']) ?
-                                    <ColorPicker
-                                        fieldName='heartColor' label={this._('Heart rate/off target')} color={state.heartColor} onChange={this.onChange.bind(this, 'heartColor')}
-                                        secondColor={state.heartColorOff} onSecondColorChange={this.onChange.bind(this, 'heartColorOff')} />
+                                    <div>
+                                        <ColorPicker
+                                            fieldName='heartColor' label={this._('Heart rate/outside limits')} color={state.heartColor} onChange={this.onChange.bind(this, 'heartColor')}
+                                            secondColor={state.heartColorOff} onSecondColorChange={this.onChange.bind(this, 'heartColorOff')} />
+                                        <HelperText>{this._('Set upper and lower limits in the health section below.')}</HelperText>
+                                    </div>
+                                : null}
+                                {this.isEnabled(['15']) ?
+                                    <ColorPicker fieldName='compassColor' label={this._('Compass')} color={state.compassColor} onChange={this.onChange.bind(this, 'compassColor')} />
                                 : null}
                             </Versioned>
                         </div>
@@ -708,7 +732,7 @@ class Layout extends Component {
                                 label={this._('Upper heart rate limit')}
                                 value={state.heartHigh}
                                 onChange={this.onChange.bind(this, 'heartHigh')}/>
-                            <HelperText>{this._('If any of the values are set and different than zero we\'ll show the heart rate in a different color when it\'s below the lower threshold or above the upper threshold.')}</HelperText>
+                            <HelperText>{this._('If any of the values are set and different than zero we\'ll show the heart rate in a different color when it\'s below the lower limit or above the upper limit.')}</HelperText>
                         </OptionGroup>
                     : null}
                 </Versioned>
