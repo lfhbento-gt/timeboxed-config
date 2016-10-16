@@ -101,6 +101,11 @@ class Layout extends Component {
                 weatherTime: '30',
                 heartLow: '0',
                 heartHigh: '0',
+                showWrist: false,
+                wristSlotA: '11',
+                wristSlotB: '12',
+                wristSlotC: '8',
+                wristSlotD: '13',
             });
             this.defaultColors = Object.assign({}, this.defaultColors, {
                 heartColor: '#FFFFFF',
@@ -134,6 +139,12 @@ class Layout extends Component {
             'tapSlotB',
             'tapSlotC',
             'tapSlotD',
+        ];
+        this.moduleWristStateKeys = [
+            'wristSlotA',
+            'wristSlotB',
+            'wristSlotC',
+            'wristSlotD',
         ];
 
         this.state = Object.assign({}, this.defaultState, this.defaultColors, newState);
@@ -481,6 +492,29 @@ class Layout extends Component {
             );
         }
 
+        if (state.showWrist) {
+            modules['Shake'] = (
+                <div>
+                    <SideBySideFields>
+                        <DropdownField fieldName='top-left-wrist' label={this._('Top Left')} options={this.modules}
+                            searchable={false} clearable={false} labelPosition='top'
+                            selectedItem={state.wristSlotA} onChange={this.onChangeDropdown.bind(this, 'wristSlotA')}/>
+                        <DropdownField fieldName='top-right-wrist' label={this._('Top Right')} options={this.modules}
+                            searchable={false} clearable={false} labelPosition='top'
+                            selectedItem={state.wristSlotB} onChange={this.onChangeDropdown.bind(this, 'wristSlotB')}/>
+                    </SideBySideFields>
+                    <SideBySideFields>
+                        <DropdownField fieldName='bottom-left-wrist' label={this._('Bottom Left')} options={this.modules}
+                            searchable={false} clearable={false} labelPosition='bottom'
+                            selectedItem={state.wristSlotC} onChange={this.onChangeDropdown.bind(this, 'wristSlotC')}/>
+                        <DropdownField fieldName='bottom-right-wrist' label={this._('Bottom Right')} options={this.modules}
+                            searchable={false} clearable={false} labelPosition='bottom'
+                            selectedItem={state.wristSlotD} onChange={this.onChangeDropdown.bind(this, 'wristSlotD')}/>
+                    </SideBySideFields>
+                </div>
+            );
+        }
+
         return modules;
     }
 
@@ -509,7 +543,7 @@ class Layout extends Component {
             modules['Sleep'] = (
                 <div>
                     <DropdownField fieldName='top-left-sleep' label={this._('Top 1')} options={this.modules}
-                        searchable={false} clearable={false} 
+                        searchable={false} clearable={false}
                         selectedItem={state.sleepSlotA} onChange={this.onChangeDropdown.bind(this, 'sleepSlotA')}/>
                     <DropdownField fieldName='top-right-sleep' label={this._('Top 2')} options={this.modules}
                         searchable={false} clearable={false}
@@ -528,7 +562,7 @@ class Layout extends Component {
             modules['Tap'] = (
                 <div>
                     <DropdownField fieldName='top-left-tap' label={this._('Top 1')} options={this.modules}
-                        searchable={false} clearable={false} 
+                        searchable={false} clearable={false}
                         selectedItem={state.tapSlotA} onChange={this.onChangeDropdown.bind(this, 'tapSlotA')}/>
                     <DropdownField fieldName='top-right-tap' label={this._('Top 2')} options={this.modules}
                         searchable={false} clearable={false}
@@ -539,6 +573,25 @@ class Layout extends Component {
                     <DropdownField fieldName='bottom-right-tap' label={this._('Bottom 2')} options={this.modules}
                         searchable={false} clearable={false}
                         selectedItem={state.tapSlotD} onChange={this.onChangeDropdown.bind(this, 'tapSlotD')}/>
+                </div>
+            );
+        }
+
+        if (state.showWrist) {
+            modules['Shake'] = (
+                <div>
+                    <DropdownField fieldName='top-left-wrist' label={this._('Top 1')} options={this.modules}
+                        searchable={false} clearable={false}
+                        selectedItem={state.wristSlotA} onChange={this.onChangeDropdown.bind(this, 'wristSlotA')}/>
+                    <DropdownField fieldName='top-right-wrist' label={this._('Top 2')} options={this.modules}
+                        searchable={false} clearable={false}
+                        selectedItem={state.wristSlotB} onChange={this.onChangeDropdown.bind(this, 'wristSlotB')}/>
+                    <DropdownField fieldName='bottom-left-wrist' label={this._('Bottom 1')} options={this.modules}
+                        searchable={false} clearable={false}
+                        selectedItem={state.wristSlotC} onChange={this.onChangeDropdown.bind(this, 'wristSlotC')}/>
+                    <DropdownField fieldName='bottom-right-wrist' label={this._('Bottom 2')} options={this.modules}
+                        searchable={false} clearable={false}
+                        selectedItem={state.wristSlotD} onChange={this.onChangeDropdown.bind(this, 'wristSlotD')}/>
                 </div>
             );
         }
@@ -604,9 +657,10 @@ class Layout extends Component {
                     : null}
                     <Versioned minVersion="4.0" version={this.currentVersion}>
                         <ToggleField fieldName='showTap' label={this._('Enable tap mode')} checked={state.showTap} onChange={this.onChange.bind(this, 'showTap')} />
-                        <HelperText>{this._('<strong>Experimental feature:</strong> If set, the watchface will show the modules under the \'Tap\' tab for the amount of time selected below when you tap the watch screen, switching back to the previous view after that. Keep in mind that tap detection is a bit rudimentary because of pebble\'s accelerometer, so light taps might not work. Enabling this feature might drain the battery a bit faster than usual.')}</HelperText>
-                        {this.state.showTap ?
-                            <RadioButtonGroup fieldName='tapTime' label='Tap mode duration' options={[
+                        <ToggleField fieldName='showWrist' label={this._('Enable wrist shake mode')} checked={state.showWrist} onChange={this.onChange.bind(this, 'showWrist')} />
+                        <HelperText>{this._('<strong>Experimental features:</strong> If set, the watchface will show the modules under the \'Tap\' tab when you tap the watch screen or the modules under \'Shake\' when you shake your wrist for the amount of time selected below , switching back to the previous view after that. Keep in mind that tap detection is a bit rudimentary because of pebble\'s accelerometer, so light taps might not work. <strong>Enabling these features might drain the battery a faster than usual.</strong>')}</HelperText>
+                        {this.state.showTap || this.state.showWrist ?
+                            <RadioButtonGroup fieldName='tapTime' label='Tap/Shake mode duration' options={[
                                 {value: '5', label: this._('5s')},
                                 {value: '7', label: this._('7s')},
                                 {value: '10', label: this._('10s')},
@@ -625,7 +679,7 @@ class Layout extends Component {
                             {value: '2', label: this._('/')},
                         ]} selectedItem={state.dateSeparator} onChange={this.onChange.bind(this, 'dateSeparator')}/>
                     </Versioned>
-                    <Versioned maxVersion="4.0" version={this.currentVersion}>
+                    <Versioned minVersion="4.0" version={this.currentVersion}>
                         <RadioButtonGroup fieldName='dateSeparator' label='Date separator' options={[
                             {value: '0', label: this._('(space)')},
                             {value: '1', label: this._('.')},
