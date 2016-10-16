@@ -2,5 +2,7 @@
 /.lock-*
 *.swp
 *.swo
+*.log
 node_modules/
 dist/
+deploy/

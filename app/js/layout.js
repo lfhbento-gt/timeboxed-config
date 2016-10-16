@@ -295,7 +295,11 @@ class Layout extends Component {
                 {value: '15', label: this._('Compass')},
             ]);
             this.healthModules.push('14');
-            this.dateFormatOptions.push({value: '9', label: this._('ISO-8601 (year, month, day)')})
+            this.dateFormatOptions = this.dateFormatOptions.concat([
+                {value: '9', label: this._('ISO-8601 (year, month, day)')},
+                {value: '10', label: this._('Week number, day, month (number)')},
+                {value: '11', label: this._('Week number, month (number), day')},
+            ])
         }
 
         this.modules = this.platform === 'aplite' ? this.modulesAplite : this.modulesAll;

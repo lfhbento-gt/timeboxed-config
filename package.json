@@ -8,6 +8,7 @@
     "bootstrap-toggle": "^2.2.2",
     "classnames": "^2.2.3",
     "es6-promise": "^3.2.1",
+    "express": "^4.14.0",
     "isomorphic-fetch": "^2.2.1",
     "jquery": "^2.2.3",
     "object-assign": "^4.1.0",
@@ -46,11 +47,9 @@
   "scripts": {
     "build": "webpack --config ./webpack-config.js --bail --colors --progress",
     "build-watch": "webpack --config ./webpack-config.js --watch --colors --progress",
-    "build-watch-min": "NODE_ENV=production webpack --config ./webpack-config.js --watch --colors --progress",
-    "build-min": "NODE_ENV=production webpack --config ./webpack-config.js --bail --colors --progress",
-    "clean": "rm -rf dist/",
-    "wipe": "rm -rf dist/ && rm -rf node_modules/",
-    "start-dev": "webpack-dev-server --content-base dist/ --host=0.0.0.0"
+    "clean": "rm -rf dist/ && rm -rf node_modules/ && (mv deploy/.git .git_tmp 2>/dev/null || true) && rm -rf deploy/ && mkdir deploy && (mv .git_tmp deploy/.git 2>/dev/null || true)",
+    "deploy": "npm run build && mkdir -p deploy/dist/ && cp -R server/* deploy/ && cp -R dist/* deploy/dist/",
+    "build-deploy": "webpack --config ./webpack-config.js --bail --colors --progress && mkdir -p deploy/dist/ && cp -R server/* deploy/ && cp -R dist/* deploy/dist/"
   },
   "repository": {
     "type": "git",

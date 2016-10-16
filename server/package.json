@@ -1,0 +1,22 @@
+{
+  "name": "timeboxed",
+  "version": "0.0.0",
+  "private": true,
+  "main": "start.js",
+  "scripts": {
+    "start": "node --use_strict start.js",
+    "start-prod": "NODE_ENV=production node --use_strict start.js",
+    "deploy-stage": "(git diff --quiet --exit-code || git commit -am \"new deploy\") && git push deploy HEAD --force",
+    "deploy-prod": "(git diff --quiet --exit-code || git commit -am \"new deploy\") && git push prod HEAD --force"
+  },
+  "dependencies": {
+    "body-parser": "~1.15.1",
+    "compression": "^1.6.2",
+    "cookie-parser": "~1.4.3",
+    "debug": "~2.2.0",
+    "express": "~4.13.4",
+    "jade": "~1.11.0",
+    "morgan": "~1.7.0",
+    "serve-favicon": "~2.3.0"
+  }
+}
