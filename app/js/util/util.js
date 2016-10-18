@@ -124,4 +124,33 @@ const verifyLocation = (loc, provider, apiKey, callback=() => {}) => {
 
 };
 
-export { getCurrentVersion, checkForUpdates, verifyLocation, getReturnUrl, getPlatform }
+const fetchMasterKeyData = (email, pin, callback=() => {}) => {
+    if (!email || !pin) {
+        callback({});
+        return;
+    }
+
+    let url = `https://pmkey.xyz/search/?email=${email}&pin=${pin}`;
+    fetch(url)
+        .then(response => {
+            if (response.status >= 400) {
+                throw new Error("Bad response from server");
+            }
+            return response.json();
+        })
+        .then(json => {
+            if (!json.success || !json.keys || !json.keys.weather) {
+                throw new Error("No keys found");
+                callback({});
+            } else {
+                callback(json.keys.weather);
+            }
+        })
+        ['catch'](ex => {
+            console.log(ex.stack);
+            alert(ex.message);
+            callback({});
+        });
+};
+
+export { getCurrentVersion, checkForUpdates, verifyLocation, getReturnUrl, getPlatform, fetchMasterKeyData }

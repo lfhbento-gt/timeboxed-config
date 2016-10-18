@@ -48,8 +48,10 @@
     "build": "webpack --config ./webpack-config.js --bail --colors --progress",
     "build-watch": "webpack --config ./webpack-config.js --watch --colors --progress",
     "clean": "rm -rf dist/ && rm -rf node_modules/ && (mv deploy/.git .git_tmp 2>/dev/null || true) && rm -rf deploy/ && mkdir deploy && (mv .git_tmp deploy/.git 2>/dev/null || true)",
-    "deploy": "npm run build && mkdir -p deploy/dist/ && cp -R server/* deploy/ && cp -R dist/* deploy/dist/",
-    "build-deploy": "webpack --config ./webpack-config.js --bail --colors --progress && mkdir -p deploy/dist/ && cp -R server/* deploy/ && cp -R dist/* deploy/dist/"
+    "deploy": "mkdir -p deploy/dist/ && cp -R server/* deploy/ && cp -R dist/* deploy/dist/",
+    "build-deploy": "webpack --config ./webpack-config.js --bail --colors --progress && mkdir -p deploy/dist/ && cp -R server/* deploy/ && cp -R dist/* deploy/dist/",
+    "build-deploy-start": "webpack --config ./webpack-config.js --bail --colors --progress && mkdir -p deploy/dist/ && cp -R server/* deploy/ && cp -R dist/* deploy/dist/ && node --use_strict deploy/start.js",
+    "build-deploy-start-prod": "webpack --config ./webpack-config.js --bail --colors --progress && mkdir -p deploy/dist/ && cp -R server/* deploy/ && cp -R dist/* deploy/dist/ && NODE_ENV=production node --use_strict deploy/start.js"
   },
   "repository": {
     "type": "git",

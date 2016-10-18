@@ -13,7 +13,7 @@ import Versioned, { shouldShow } from './versioned';
 import ColorPresets from './color-presets';
 import DonateButton from './donate';
 import { getLocaleById, getText } from './lang';
-import { verifyLocation, getPlatform, getCurrentVersion } from './util/util';
+import { verifyLocation, getPlatform, getCurrentVersion, fetchMasterKeyData } from './util/util';
 
 import 'bootstrap/scss/bootstrap-flex.scss';
 import 'react-select/scss/default.scss';
@@ -94,9 +94,9 @@ class Layout extends Component {
             this.defaultState = Object.assign({}, this.defaultState, {
                 showTap: false,
                 tapTime: '7',
-                tapSlotA: '11',
-                tapSlotB: '12',
-                tapSlotC: '8',
+                tapSlotA: '15',
+                tapSlotB: '14',
+                tapSlotC: '5',
                 tapSlotD: '13',
                 weatherTime: '30',
                 heartLow: '0',
@@ -105,12 +105,23 @@ class Layout extends Component {
                 wristSlotA: '11',
                 wristSlotB: '12',
                 wristSlotC: '8',
-                wristSlotD: '13',
+                wristSlotD: '16',
+                masterKeyEmail: '',
+                masterKeyPin: '',
+                slotE: '18',
+                slotF: '17',
+                sleepSlotE: '18',
+                sleepSlotF: '17',
+                tapSlotE: '18',
+                tapSlotF: '17',
+                wristSlotE: '18',
+                wristSlotF: '17',
             });
             this.defaultColors = Object.assign({}, this.defaultColors, {
                 heartColor: '#FFFFFF',
                 heartColorOff: '#FFFFFF',
                 compassColor: '#FFFFFF',
+                secondsColor: '#FFFFFF',
             });
         }
 
@@ -154,6 +165,7 @@ class Layout extends Component {
         this.onSubmit = this.onSubmit.bind(this);
         this.toggleDebug = this.toggleDebug.bind(this);
         this.wipeConfigs = this.wipeConfigs.bind(this);
+        this.getMasterKeyData = this.getMasterKeyData.bind(this);
         
         this.modulesAll = [
             {value: '0', label: this._('None')},
@@ -304,13 +316,46 @@ class Layout extends Component {
             this.modulesAll = this.modulesAll.concat([
                 {value: '14', label: this._('Heart rate')},
                 {value: '15', label: this._('Compass')},
+                {value: '16', label: this._('Seconds')},
+                {value: '17', label: this._('Battery level')},
+            ]);
+            this.modulesAplite = this.modulesAplite.concat([
+                {value: '15', label: this._('Compass')},
+                {value: '16', label: this._('Seconds')},
+                {value: '17', label: this._('Battery level')},
             ]);
             this.healthModules.push('14');
             this.dateFormatOptions = this.dateFormatOptions.concat([
                 {value: '9', label: this._('ISO-8601 (year, month, day)')},
                 {value: '10', label: this._('Week number, day, month (number)')},
                 {value: '11', label: this._('Week number, month (number), day')},
-            ])
+            ]);
+            this.textModulesAll = [
+                {value: '0', label: this._('None')},
+                {value: '3', label: this._('Steps')},
+                {value: '4', label: this._('Distance')},
+                {value: '5', label: this._('Calories')},
+                {value: '6', label: this._('Sleep Time')},
+                {value: '7', label: this._('Deep Sleep Time')},
+                {value: '13', label: this._('Active time')},
+                {value: '16', label: this._('Seconds')},
+                {value: '17', label: this._('Battery level')},
+                {value: '18', label: this._('Alternate time zone')},
+            ];
+            
+            this.textModulesAplite = [
+                {value: '0', label: this._('None')},
+                {value: '16', label: this._('Seconds')},
+                {value: '17', label: this._('Battery level')},
+                {value: '18', label: this._('Alternate time zone')},
+            ];
+
+            this.moduleStateKeys = this.moduleStateKeys.concat(['slotE', 'slotF']);
+            this.moduleSleepStateKeys = this.moduleSleepStateKeys.concat(['sleepSlotE', 'sleepSlotF']);
+            this.moduleTapStateKeys = this.moduleTapStateKeys.concat(['tapSlotE', 'tapSlotF']);
+            this.moduleWristStateKeys = this.moduleWristStateKeys.concat(['wristSlotE', 'wristSlotF']);
+            
+            this.textModules = this.platform === 'aplite' ? this.textModulesAplite : this.textModulesAll;
         }
 
         this.modules = this.platform === 'aplite' ? this.modulesAplite : this.modulesAll;
@@ -398,13 +443,15 @@ class Layout extends Component {
         return (
             this.moduleStateKeys.some(key => moduleIndexes.indexOf(this.state[key]) !== -1) ||
             (this.state.showSleep && this.moduleSleepStateKeys.some(key => moduleIndexes.indexOf(this.state[key]) !== -1)) ||
-            (this.state.showTap && this.moduleTapStateKeys.some(key => moduleIndexes.indexOf(this.state[key]) !== -1))
+            (this.state.showTap && this.moduleTapStateKeys.some(key => moduleIndexes.indexOf(this.state[key]) !== -1)) ||
+            (this.state.showWrist && this.moduleWristStateKeys.some(key => moduleIndexes.indexOf(this.state[key]) !== -1))
         )
     }
 
-    isEnabledTap(moduleIndexes) {
+    isEnabledTapWrist(moduleIndexes) {
         return (
-            (this.state.showTap && this.moduleTapStateKeys.some(key => moduleIndexes.indexOf(this.state[key]) !== -1))
+            (this.state.showTap && this.moduleTapStateKeys.some(key => moduleIndexes.indexOf(this.state[key]) !== -1)) ||
+            (this.state.showWrist && this.moduleWristStateKeys.some(key => moduleIndexes.indexOf(this.state[key]) !== -1))
         )
     }
 
@@ -421,179 +468,167 @@ class Layout extends Component {
         verifyLocation(loc, this.state.weatherProvider, this.state.weatherKey);
     }
 
+    getMasterKeyData() {
+        console.log(`Fetching data for ${this.state.masterKeyEmail}`);
+        fetchMasterKeyData(this.state.masterKeyEmail, this.state.masterKeyPin, (keys) => {
+            console.log(`WU: ${keys.wu} / DarkSky ${keys.forecast}`);
+            alert('Keys retrieved successfully!');
+            this.setState({
+                weatherKey: keys.wu || '',
+                forecastKey: keys.forecast || '',
+            });
+        });
+    }
+
+    getModules(options) {
+        return (
+            <div>
+                {options.map(item => {
+                    if (Array.isArray(item)) {
+                        return (
+                            <SideBySideFields>
+                                <DropdownField fieldName={item[0].name} label={item[0].label} options={item[0].textOnly ? this.textModules : this.modules}
+                                    searchable={false} clearable={false} labelPosition={item[0].labelPosition}
+                                    selectedItem={this.state[item[0].slot]} onChange={this.onChangeDropdown.bind(this, item[0].slot)}/>
+                                <DropdownField fieldName={item[1].name} label={item[1].label} options={item[1].textOnly ? this.textModules : this.modules}
+                                    searchable={false} clearable={false} labelPosition={item[1].labelPosition}
+                                    selectedItem={this.state[item[1].slot]} onChange={this.onChangeDropdown.bind(this, item[1].slot)}/>
+                            </SideBySideFields>
+                        )
+                    } else {
+                        return <DropdownField fieldName={item.name} label={item.label} options={item.textOnly ? this.textModules : this.modules}
+                                searchable={false} clearable={false} labelPosition={item.labelPosition}
+                                selectedItem={this.state[item.slot]} onChange={this.onChangeDropdown.bind(this, item.slot)}/>
+                    }
+                })}
+            </div>
+        );
+    }
+
     getEnabledModules() {
         let state = this.state;
+
         let modules = {
-            'Default': (
-                <div>
-                    <SideBySideFields>
-                        <DropdownField fieldName='top-left' label={this._('Top Left')} options={this.modules}
-                            searchable={false} clearable={false} labelPosition='top'
-                            selectedItem={state.slotA} onChange={this.onChangeDropdown.bind(this, 'slotA')}/>
-                        <DropdownField fieldName='top-right' label={this._('Top Right')} options={this.modules}
-                            searchable={false} clearable={false} labelPosition='top'
-                            selectedItem={state.slotB} onChange={this.onChangeDropdown.bind(this, 'slotB')}/>
-                    </SideBySideFields>
-                    <SideBySideFields>
-                        <DropdownField fieldName='bottom-left' label={this._('Bottom Left')} options={this.modules}
-                            searchable={false} clearable={false} labelPosition='bottom'
-                            selectedItem={state.slotC} onChange={this.onChangeDropdown.bind(this, 'slotC')}/>
-                        <DropdownField fieldName='bottom-right' label={this._('Bottom Right')} options={this.modules}
-                            searchable={false} clearable={false} labelPosition='bottom'
-                            selectedItem={state.slotD} onChange={this.onChangeDropdown.bind(this, 'slotD')}/>
-                    </SideBySideFields>
-                </div>
-            ),
+            'Default': this.getModules([
+                [{name: 'top-left', label: this._('Top Left'), slot: 'slotA', textOnly: false, labelPosition: 'top'},
+                {name: 'top-right', label: this._('Top Right'), slot: 'slotB', textOnly: false, labelPosition: 'top'}],
+                ...(shouldShow(this.currentVersion, "4.0", null) ? [
+                    {name: 'center-top', label: this._('Center Top'), slot: 'slotE', textOnly: true, labelPosition: 'top'},
+                    {name: 'center-bottom', label: this._('Center Bottom'), slot: 'slotF', textOnly: true, labelPosition: 'bottom'},
+                ] : []),
+                [{name: 'bottom-left', label: this._('Bottom Left'), slot: 'slotC', textOnly: false, labelPosition: 'bottom'},
+                {name: 'bottom-right', label: this._('Bottom Right'), slot: 'slotD', textOnly: false, labelPosition: 'bottom'}],
+            ])
         };
 
         if (state.showSleep) {
-            modules['Sleep'] = (
-                <div>
-                    <SideBySideFields>
-                        <DropdownField fieldName='top-left-sleep' label={this._('Top Left')} options={this.modules}
-                            searchable={false} clearable={false} labelPosition='top'
-                            selectedItem={state.sleepSlotA} onChange={this.onChangeDropdown.bind(this, 'sleepSlotA')}/>
-                        <DropdownField fieldName='top-right-sleep' label={this._('Top Right')} options={this.modules}
-                            searchable={false} clearable={false} labelPosition='top'
-                            selectedItem={state.sleepSlotB} onChange={this.onChangeDropdown.bind(this, 'sleepSlotB')}/>
-                    </SideBySideFields>
-                    <SideBySideFields>
-                        <DropdownField fieldName='bottom-left-sleep' label={this._('Bottom Left')} options={this.modules}
-                            searchable={false} clearable={false} labelPosition='bottom'
-                            selectedItem={state.sleepSlotC} onChange={this.onChangeDropdown.bind(this, 'sleepSlotC')}/>
-                        <DropdownField fieldName='bottom-right-sleep' label={this._('Bottom Right')} options={this.modules}
-                            searchable={false} clearable={false} labelPosition='bottom'
-                            selectedItem={state.sleepSlotD} onChange={this.onChangeDropdown.bind(this, 'sleepSlotD')}/>
-                    </SideBySideFields>
-                </div>
-            );
+            modules['Sleep'] = this.getModules([
+                [{name: 'top-left-sleep', label: this._('Top Left'), slot: 'sleepSlotA', textOnly: false, labelPosition: 'top'},
+                {name: 'top-right-sleep', label: this._('Top Right'), slot: 'sleepSlotB', textOnly: false, labelPosition: 'top'}],
+                ...(shouldShow(this.currentVersion, "4.0", null) ? [
+                    {name: 'center-top-sleep', label: this._('Center Top'), slot: 'sleepSlotE', textOnly: true, labelPosition: 'top'},
+                    {name: 'center-bottom-sleep', label: this._('Center Bottom'), slot: 'sleepSlotF', textOnly: true, labelPosition: 'bottom'},
+                ] : []),
+                [{name: 'bottom-left-sleep', label: this._('Bottom Left'), slot: 'sleepSlotC', textOnly: false, labelPosition: 'bottom'},
+                {name: 'bottom-right-sleep', label: this._('Bottom Right'), slot: 'sleepSlotD', textOnly: false, labelPosition: 'bottom'}],
+            ]);
         }
         
         if (state.showTap) {
-            modules['Tap'] = (
-                <div>
-                    <SideBySideFields>
-                        <DropdownField fieldName='top-left-tap' label={this._('Top Left')} options={this.modules}
-                            searchable={false} clearable={false} labelPosition='top'
-                            selectedItem={state.tapSlotA} onChange={this.onChangeDropdown.bind(this, 'tapSlotA')}/>
-                        <DropdownField fieldName='top-right-tap' label={this._('Top Right')} options={this.modules}
-                            searchable={false} clearable={false} labelPosition='top'
-                            selectedItem={state.tapSlotB} onChange={this.onChangeDropdown.bind(this, 'tapSlotB')}/>
-                    </SideBySideFields>
-                    <SideBySideFields>
-                        <DropdownField fieldName='bottom-left-tap' label={this._('Bottom Left')} options={this.modules}
-                            searchable={false} clearable={false} labelPosition='bottom'
-                            selectedItem={state.tapSlotC} onChange={this.onChangeDropdown.bind(this, 'tapSlotC')}/>
-                        <DropdownField fieldName='bottom-right-tap' label={this._('Bottom Right')} options={this.modules}
-                            searchable={false} clearable={false} labelPosition='bottom'
-                            selectedItem={state.tapSlotD} onChange={this.onChangeDropdown.bind(this, 'tapSlotD')}/>
-                    </SideBySideFields>
-                </div>
-            );
+            modules['Tap'] = this.getModules([
+                [{name: 'top-left-tap', label: this._('Top Left'), slot: 'tapSlotA', textOnly: false, labelPosition: 'top'},
+                {name: 'top-right-tap', label: this._('Top Right'), slot: 'tapSlotB', textOnly: false, labelPosition: 'top'}],
+                ...(shouldShow(this.currentVersion, "4.0", null) ? [
+                    {name: 'center-top-tap', label: this._('Center Top'), slot: 'tapSlotE', textOnly: true, labelPosition: 'top'},
+                    {name: 'center-bottom-tap', label: this._('Center Bottom'), slot: 'tapSlotF', textOnly: true, labelPosition: 'bottom'},
+                ] : []),
+                [{name: 'bottom-left-tap', label: this._('Bottom Left'), slot: 'tapSlotC', textOnly: false, labelPosition: 'bottom'},
+                {name: 'bottom-right-tap', label: this._('Bottom Right'), slot: 'tapSlotD', textOnly: false, labelPosition: 'bottom'}],
+            ]);
         }
 
         if (state.showWrist) {
-            modules['Shake'] = (
-                <div>
-                    <SideBySideFields>
-                        <DropdownField fieldName='top-left-wrist' label={this._('Top Left')} options={this.modules}
-                            searchable={false} clearable={false} labelPosition='top'
-                            selectedItem={state.wristSlotA} onChange={this.onChangeDropdown.bind(this, 'wristSlotA')}/>
-                        <DropdownField fieldName='top-right-wrist' label={this._('Top Right')} options={this.modules}
-                            searchable={false} clearable={false} labelPosition='top'
-                            selectedItem={state.wristSlotB} onChange={this.onChangeDropdown.bind(this, 'wristSlotB')}/>
-                    </SideBySideFields>
-                    <SideBySideFields>
-                        <DropdownField fieldName='bottom-left-wrist' label={this._('Bottom Left')} options={this.modules}
-                            searchable={false} clearable={false} labelPosition='bottom'
-                            selectedItem={state.wristSlotC} onChange={this.onChangeDropdown.bind(this, 'wristSlotC')}/>
-                        <DropdownField fieldName='bottom-right-wrist' label={this._('Bottom Right')} options={this.modules}
-                            searchable={false} clearable={false} labelPosition='bottom'
-                            selectedItem={state.wristSlotD} onChange={this.onChangeDropdown.bind(this, 'wristSlotD')}/>
-                    </SideBySideFields>
-                </div>
-            );
+            modules['Shake'] = this.getModules([
+                [{name: 'top-left-wrist', label: this._('Top Left'), slot: 'wristSlotA', textOnly: false, labelPosition: 'top'},
+                {name: 'top-right-wrist', label: this._('Top Right'), slot: 'wristSlotB', textOnly: false, labelPosition: 'top'}],
+                ...(shouldShow(this.currentVersion, "4.0", null) ? [
+                    {name: 'center-top-wrist', label: this._('Center Top'), slot: 'wristSlotE', textOnly: true, labelPosition: 'top'},
+                    {name: 'center-bottom-wrist', label: this._('Center Bottom'), slot: 'wristSlotF', textOnly: true, labelPosition: 'bottom'},
+                ] : []),
+                [{name: 'bottom-left-wrist', label: this._('Bottom Left'), slot: 'wristSlotC', textOnly: false, labelPosition: 'bottom'},
+                {name: 'bottom-right-wrist', label: this._('Bottom Right'), slot: 'wristSlotD', textOnly: false, labelPosition: 'bottom'}],
+            ]);
         }
 
         return modules;
     }
 
+    getModulesRound(options) {
+        return (
+            <div>
+                {options.map(item => {
+                    return <DropdownField fieldName={item.name} label={item.label} options={item.textOnly ? this.textModules : this.modules}
+                        searchable={false} clearable={false} labelPosition={item.labelPosition}
+                        selectedItem={this.state[item.slot]} onChange={this.onChangeDropdown.bind(this, item.slot)}/>
+            
+                })}
+            </div>
+        );
+    }
+
     getEnabledModulesRound() {
         let state = this.state;
+
         let modules = {
-            'Default': (
-                <div>
-                    <DropdownField fieldName='top-left' label={this._('Top 1')} options={this.modules}
-                        searchable={false} clearable={false}
-                        selectedItem={state.slotA} onChange={this.onChangeDropdown.bind(this, 'slotA')}/>
-                    <DropdownField fieldName='top-right' label={this._('Top 2')} options={this.modules}
-                        searchable={false} clearable={false}
-                        selectedItem={state.slotB} onChange={this.onChangeDropdown.bind(this, 'slotB')}/>
-                    <DropdownField fieldName='bottom-left' label={this._('Bottom 1')} options={this.modules}
-                        searchable={false} clearable={false}
-                        selectedItem={state.slotC} onChange={this.onChangeDropdown.bind(this, 'slotC')}/>
-                    <DropdownField fieldName='bottom-right' label={this._('Bottom 2')} options={this.modules}
-                        searchable={false} clearable={false}
-                        selectedItem={state.slotD} onChange={this.onChangeDropdown.bind(this, 'slotD')}/>
-                </div>
-            ),
+            'Default': this.getModulesRound([
+                {name: 'top-left', label: this._('Top 1'), slot: 'slotA', textOnly: false, labelPosition: 'top'},
+                {name: 'top-right', label: this._('Top 2'), slot: 'slotB', textOnly: false, labelPosition: 'top'},
+                ...(shouldShow(this.currentVersion, "4.0", null) ? [
+                    {name: 'center-top', label: this._('Center top'), slot: 'slotE', textOnly: true, labelPosition: 'top'},
+                    {name: 'center-bottom', label: this._('Center bottom'), slot: 'slotF', textOnly: true, labelPosition: 'bottom'},
+                ] : []),
+                {name: 'bottom-left', label: this._('Bottom 1'), slot: 'slotC', textOnly: false, labelPosition: 'bottom'},
+                {name: 'bottom-right', label: this._('Bottom 2'), slot: 'slotD', textOnly: false, labelPosition: 'bottom'},
+            ])
         };
 
         if (state.showSleep) {
-            modules['Sleep'] = (
-                <div>
-                    <DropdownField fieldName='top-left-sleep' label={this._('Top 1')} options={this.modules}
-                        searchable={false} clearable={false}
-                        selectedItem={state.sleepSlotA} onChange={this.onChangeDropdown.bind(this, 'sleepSlotA')}/>
-                    <DropdownField fieldName='top-right-sleep' label={this._('Top 2')} options={this.modules}
-                        searchable={false} clearable={false}
-                        selectedItem={state.sleepSlotB} onChange={this.onChangeDropdown.bind(this, 'sleepSlotB')}/>
-                    <DropdownField fieldName='bottom-left-sleep' label={this._('Bottom 1')} options={this.modules}
-                        searchable={false} clearable={false}
-                        selectedItem={state.sleepSlotC} onChange={this.onChangeDropdown.bind(this, 'sleepSlotC')}/>
-                    <DropdownField fieldName='bottom-right-sleep' label={this._('Bottom 2')} options={this.modules}
-                        searchable={false} clearable={false}
-                        selectedItem={state.sleepSlotD} onChange={this.onChangeDropdown.bind(this, 'sleepSlotD')}/>
-                </div>
-            );
+            modules['Sleep'] = this.getModulesRound([
+                {name: 'top-left-sleep', label: this._('Top 1'), slot: 'sleepSlotA', textOnly: false, labelPosition: 'top'},
+                {name: 'top-right-sleep', label: this._('Top 2'), slot: 'sleepSlotB', textOnly: false, labelPosition: 'top'},
+                ...(shouldShow(this.currentVersion, "4.0", null) ? [
+                    {name: 'center-top-sleep', label: this._('Center top'), slot: 'sleepSlotE', textOnly: true, labelPosition: 'top'},
+                    {name: 'center-bottom-sleep', label: this._('Center bottom'), slot: 'sleepSlotF', textOnly: true, labelPosition: 'bottom'},
+                ] : []),
+                {name: 'bottom-left-sleep', label: this._('Bottom 1'), slot: 'sleepSlotC', textOnly: false, labelPosition: 'bottom'},
+                {name: 'bottom-right-sleep', label: this._('Bottom 2'), slot: 'sleepSlotD', textOnly: false, labelPosition: 'bottom'},
+            ]);
         }
 
         if (state.showTap) {
-            modules['Tap'] = (
-                <div>
-                    <DropdownField fieldName='top-left-tap' label={this._('Top 1')} options={this.modules}
-                        searchable={false} clearable={false}
-                        selectedItem={state.tapSlotA} onChange={this.onChangeDropdown.bind(this, 'tapSlotA')}/>
-                    <DropdownField fieldName='top-right-tap' label={this._('Top 2')} options={this.modules}
-                        searchable={false} clearable={false}
-                        selectedItem={state.tapSlotB} onChange={this.onChangeDropdown.bind(this, 'tapSlotB')}/>
-                    <DropdownField fieldName='bottom-left-tap' label={this._('Bottom 1')} options={this.modules}
-                        searchable={false} clearable={false}
-                        selectedItem={state.tapSlotC} onChange={this.onChangeDropdown.bind(this, 'tapSlotC')}/>
-                    <DropdownField fieldName='bottom-right-tap' label={this._('Bottom 2')} options={this.modules}
-                        searchable={false} clearable={false}
-                        selectedItem={state.tapSlotD} onChange={this.onChangeDropdown.bind(this, 'tapSlotD')}/>
-                </div>
-            );
+            modules['Tap'] = this.getModulesRound([
+                {name: 'top-left-tap', label: this._('Top 1'), slot: 'tapSlotA', textOnly: false, labelPosition: 'top'},
+                {name: 'top-right-tap', label: this._('Top 2'), slot: 'tapSlotB', textOnly: false, labelPosition: 'top'},
+                ...(shouldShow(this.currentVersion, "4.0", null) ? [
+                    {name: 'center-top-tap', label: this._('Center top'), slot: 'tapSlotE', textOnly: true, labelPosition: 'top'},
+                    {name: 'center-bottom-tap', label: this._('Center bottom'), slot: 'tapSlotF', textOnly: true, labelPosition: 'bottom'},
+                ] : []),
+                {name: 'bottom-left-tap', label: this._('Bottom 1'), slot: 'tapSlotC', textOnly: false, labelPosition: 'bottom'},
+                {name: 'bottom-right-tap', label: this._('Bottom 2'), slot: 'tapSlotD', textOnly: false, labelPosition: 'bottom'},
+            ]);
         }
 
         if (state.showWrist) {
-            modules['Shake'] = (
-                <div>
-                    <DropdownField fieldName='top-left-wrist' label={this._('Top 1')} options={this.modules}
-                        searchable={false} clearable={false}
-                        selectedItem={state.wristSlotA} onChange={this.onChangeDropdown.bind(this, 'wristSlotA')}/>
-                    <DropdownField fieldName='top-right-wrist' label={this._('Top 2')} options={this.modules}
-                        searchable={false} clearable={false}
-                        selectedItem={state.wristSlotB} onChange={this.onChangeDropdown.bind(this, 'wristSlotB')}/>
-                    <DropdownField fieldName='bottom-left-wrist' label={this._('Bottom 1')} options={this.modules}
-                        searchable={false} clearable={false}
-                        selectedItem={state.wristSlotC} onChange={this.onChangeDropdown.bind(this, 'wristSlotC')}/>
-                    <DropdownField fieldName='bottom-right-wrist' label={this._('Bottom 2')} options={this.modules}
-                        searchable={false} clearable={false}
-                        selectedItem={state.wristSlotD} onChange={this.onChangeDropdown.bind(this, 'wristSlotD')}/>
-                </div>
-            );
+            modules['Shake'] = this.getModulesRound([
+                {name: 'top-left-wrist', label: this._('Top 1'), slot: 'wristSlotA', textOnly: false, labelPosition: 'top'},
+                {name: 'top-right-wrist', label: this._('Top 2'), slot: 'wristSlotB', textOnly: false, labelPosition: 'top'},
+                ...(shouldShow(this.currentVersion, "4.0", null) ? [
+                    {name: 'center-top-wrist', label: this._('Center top'), slot: 'wristSlotE', textOnly: true, labelPosition: 'top'},
+                    {name: 'center-bottom-wrist', label: this._('Center bottom'), slot: 'wristSlotF', textOnly: true, labelPosition: 'bottom'},
+                ] : []),
+                {name: 'bottom-left-wrist', label: this._('Bottom 1'), slot: 'wristSlotC', textOnly: false, labelPosition: 'bottom'},
+                {name: 'bottom-right-wrist', label: this._('Bottom 2'), slot: 'wristSlotD', textOnly: false, labelPosition: 'bottom'},
+            ]);
         }
 
         return modules;
@@ -641,13 +676,15 @@ class Layout extends Component {
                         </div>
                     : null}
 
-                    <DropdownField fieldName='timezones' label={this._('Additional Timezone')} options={this.timezones} searchable={true} clearable={false} selectedItem={state.timezones}  onChange={this.onChangeDropdown.bind(this, 'timezones')}/>
+                    <Versioned maxVersion="3.8" version={this.currentVersion}>
+                        <DropdownField fieldName='timezones' label={this._('Additional Timezone')} options={this.timezones} searchable={true} clearable={false} selectedItem={state.timezones}  onChange={this.onChangeDropdown.bind(this, 'timezones')}/>
+                    </Versioned>
                 </OptionGroup>
 
                 <OptionGroup title={this._('Modules')}>
                     <TabContainer tabs={this.platform === 'chalk' ? this.getEnabledModulesRound() : this.getEnabledModules()} />
-                    {this.isEnabled(['15']) && !this.isEnabledTap(['15']) ?
-                        <HelperText standalone={true}>{this._('<strong>Alert:</strong> Keeping the compass enabled all the time could drain battery faster. It\'s recommend setting it as a \'Tap\' module (enable tap mode below).')}</HelperText>
+                    {this.isEnabled(['15']) && !this.isEnabledTapWrist(['15']) ?
+                        <HelperText standalone={true}>{this._('<strong>Alert:</strong> Keeping the compass enabled all the time could drain battery faster. It\'s recommend setting it as a \'Tap\' or \'Shake\' module (enable them below).')}</HelperText>
                     : null}
                     {this.platform !== 'aplite' ?
                         <div>
@@ -658,7 +695,7 @@ class Layout extends Component {
                     <Versioned minVersion="4.0" version={this.currentVersion}>
                         <ToggleField fieldName='showTap' label={this._('Enable tap mode')} checked={state.showTap} onChange={this.onChange.bind(this, 'showTap')} />
                         <ToggleField fieldName='showWrist' label={this._('Enable wrist shake mode')} checked={state.showWrist} onChange={this.onChange.bind(this, 'showWrist')} />
-                        <HelperText>{this._('<strong>Experimental features:</strong> If set, the watchface will show the modules under the \'Tap\' tab when you tap the watch screen or the modules under \'Shake\' when you shake your wrist for the amount of time selected below , switching back to the previous view after that. Keep in mind that tap detection is a bit rudimentary because of pebble\'s accelerometer, so light taps might not work. <strong>Enabling these features might drain the battery a faster than usual.</strong>')}</HelperText>
+                        <HelperText>{this._('<strong>Experimental features:</strong> If set, the watchface will show the modules under the \'Tap\' tab when you tap the watch screen or the modules under \'Shake\' when you shake your wrist for the amount of time selected below , switching back to the previous view after that. Keep in mind that tap detection is a bit rudimentary because of pebble\'s accelerometer, so light taps might not work. <strong>Enabling these features might drain the battery faster than usual.</strong>')}</HelperText>
                         {this.state.showTap || this.state.showWrist ?
                             <RadioButtonGroup fieldName='tapTime' label='Tap/Shake mode duration' options={[
                                 {value: '5', label: this._('5s')},
@@ -668,6 +705,14 @@ class Layout extends Component {
                         : null}
                     </Versioned>
                 </OptionGroup>
+
+                <Versioned minVersion="4.0" version={this.currentVersion}>
+                    {this.isEnabled(['18']) ?
+                        <OptionGroup title={this._('Alternate Timezone')}>
+                            <DropdownField fieldName='timezones' label={this._('Additional Timezone')} options={this.timezones} searchable={true} clearable={false} selectedItem={state.timezones}  onChange={this.onChangeDropdown.bind(this, 'timezones')}/>
+                        </OptionGroup>
+                    : null}
+                </Versioned>
 
                 <OptionGroup title={this._('Localization')}>
                     <DropdownField fieldName='locale' label={this._('Language')} options={this.locales} searchable={true} clearable={false} selectedItem={state.locale} onChange={this.onChangeDropdown.bind(this, 'locale')}/>
@@ -697,10 +742,22 @@ class Layout extends Component {
                     {state.enableAdvanced ?
                         <div>
                             <ColorPicker fieldName='dateColor' label={this._('Date color')} color={state.dateColor} onChange={this.onChange.bind(this, 'dateColor')} />
-                            <ColorPicker fieldName='altHoursColor' label={this._('Alternate time color')} color={state.altHoursColor} onChange={this.onChange.bind(this, 'altHoursColor')} />
-                            <ColorPicker 
-                                fieldName='batteryColor' label={this._('Battery/Low Battery color')} color={state.batteryColor} onChange={this.onChange.bind(this, 'batteryColor')} 
-                                secondColor={state.batteryLowColor} onSecondColorChange={this.onChange.bind(this, 'batteryLowColor')} />
+                            <Versioned maxVersion="3.8" version={this.currentVersion}>
+                                <ColorPicker fieldName='altHoursColor' label={this._('Alternate time color')} color={state.altHoursColor} onChange={this.onChange.bind(this, 'altHoursColor')} />
+                                <ColorPicker 
+                                    fieldName='batteryColor' label={this._('Battery/Low Battery color')} color={state.batteryColor} onChange={this.onChange.bind(this, 'batteryColor')} 
+                                    secondColor={state.batteryLowColor} onSecondColorChange={this.onChange.bind(this, 'batteryLowColor')} />
+                            </Versioned>
+                            <Versioned minVersion="4.0" version={this.currentVersion}>
+                                {this.isEnabled(['18']) ?
+                                    <ColorPicker fieldName='altHoursColor' label={this._('Alternate timezone color')} color={state.altHoursColor} onChange={this.onChange.bind(this, 'altHoursColor')} />
+                                : null}
+                                {this.isEnabled(['17']) ?
+                                    <ColorPicker 
+                                        fieldName='batteryColor' label={this._('Battery/Low Battery color')} color={state.batteryColor} onChange={this.onChange.bind(this, 'batteryColor')} 
+                                        secondColor={state.batteryLowColor} onSecondColorChange={this.onChange.bind(this, 'batteryLowColor')} />
+                                : null}
+                            </Versioned>
                             <ColorPicker fieldName='bluetoothColor' label={this._('Bluetooth disconnected')} color={state.bluetoothColor} onChange={this.onChange.bind(this, 'bluetoothColor')} />
                             <ColorPicker fieldName='updateColor' label={this._('Update notification')} color={state.updateColor} onChange={this.onChange.bind(this, 'updateColor')} />
                             {this.isEnabled(['1']) ?
@@ -768,6 +825,9 @@ class Layout extends Component {
                                 {this.isEnabled(['15']) ?
                                     <ColorPicker fieldName='compassColor' label={this._('Compass')} color={state.compassColor} onChange={this.onChange.bind(this, 'compassColor')} />
                                 : null}
+                                {this.isEnabled(['16']) ?
+                                    <ColorPicker fieldName='secondsColor' label={this._('Seconds')} color={state.secondsColor} onChange={this.onChange.bind(this, 'secondsColor')} />
+                                : null}
                             </Versioned>
                         </div>
                     : null}
@@ -778,22 +838,6 @@ class Layout extends Component {
                         <ColorPresets colors={this.getCurrentColors()} onSelect={this.onPresetSelect}/>
                     </OptionGroup>
                 : null}
-
-                <Versioned minVersion="4.0" version={this.currentVersion}>
-                    {this.isEnabled(['14']) ?
-                        <OptionGroup title={this._('Health')}>
-                            <TextField fieldName='heartLow'
-                                label={this._('Lower heart rate limit')}
-                                value={state.heartLow}
-                                onChange={this.onChange.bind(this, 'heartLow')}/> 
-                            <TextField fieldName='heartHigh'
-                                label={this._('Upper heart rate limit')}
-                                value={state.heartHigh}
-                                onChange={this.onChange.bind(this, 'heartHigh')}/>
-                            <HelperText>{this._('If any of the values are set and different than zero we\'ll show the heart rate in a different color when it\'s below the lower limit or above the upper limit.')}</HelperText>
-                        </OptionGroup>
-                    : null}
-                </Versioned>
 
                 {this.isWeatherEnabled() ?
                     <OptionGroup title={this._('Weather')}>
@@ -853,6 +897,35 @@ class Layout extends Component {
                         <HelperText>{this._('If you define a manual location, we won\'t try to use your current location for weather info. (max. length 64 characters). <strong>Note</strong>: If you\'re not sure the city you entered is working, use the \'Verify\' button to check if it\'s a valid location.')}</HelperText>
                     </OptionGroup>
                 : null}
+
+                <Versioned minVersion="4.0" version={this.currentVersion}>
+                    <OptionGroup title={this._('Master Key (pmkey.xyz)')}>
+                        <TextField fieldName='masterKeyEmail'
+                            label={this._('Email')}
+                            value={state.masterKeyEmail}
+                            onChange={this.onChange.bind(this, 'masterKeyEmail')}/> 
+                        <TextField fieldName='masterKeyPin'
+                            label={this._('Pin')}
+                            value={state.masterKeyPin}
+                            onChange={this.onChange.bind(this, 'masterKeyPin')}/>
+                        <HelperText>{this._('Enter your email and pin to retrieve your API keys stored with Master Key. We read the WeatherUnderground and/or the DarkSky/Forecast.io API keys.')}</HelperText>
+                        <button onClick={this.getMasterKeyData} className='btn btn-primary'>{this._('Retrieve API keys')}</button>
+                    </OptionGroup>
+                    {this.isEnabled(['14']) ?
+                        <OptionGroup title={this._('Health')}>
+                            <TextField fieldName='heartLow'
+                                label={this._('Lower heart rate limit')}
+                                value={state.heartLow}
+                                onChange={this.onChange.bind(this, 'heartLow')}/> 
+                            <TextField fieldName='heartHigh'
+                                label={this._('Upper heart rate limit')}
+                                value={state.heartHigh}
+                                onChange={this.onChange.bind(this, 'heartHigh')}/>
+                            <HelperText>{this._('If any of the values are set and different than zero we\'ll show the heart rate in a different color when it\'s below the lower limit or above the upper limit.')}</HelperText>
+                        </OptionGroup>
+                    : null}
+                </Versioned>
+
 
                 <div className='block--footer'>
                     <HelperText standalone={true}>{this._('Remember to save to apply your settings.')}</HelperText>
