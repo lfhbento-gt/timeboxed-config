@@ -16,10 +16,10 @@ const getQueryParam = (variable, defaultValue) => {
     let query = location.search.substring(1);
     let vars = query.split('&');
     for (let i = 0; i < vars.length; i++) {
-	let pair = vars[i].split('=');
-	if (pair[0] === variable) {
-	    return decodeURIComponent(pair[1]);
-	}
+        let pair = vars[i].split('=');
+        if (pair[0] === variable) {
+            return decodeURIComponent(pair[1]);
+        }
     }
     return defaultValue || '';
 };
@@ -39,9 +39,7 @@ const checkForUpdates = (callback) => {
         })
         .then(json => {
             callback(json.newer, json.version);
-        })
-        ['catch'](ex => {
-            console.log(ex.stack);
+        })['catch'](() => {
             callback(false);
         });
 };
@@ -51,7 +49,7 @@ const providerUrls = {
     '1': 'http://api.wunderground.com/api/${apiKey}/conditions/forecast/q/${location}.json',
     '2': 'https://query.yahooapis.com/v1/public/yql?format=json&env=store%3A%2F%2Fdatatables.org%2Falltableswithkeys&q=select%20*%20from%20weather.forecast%20where%20woeid%20in%20(select%20woeid%20from%20geo.places%20where%20text%3D%22${location}%22)',
     '3': 'https://query.yahooapis.com/v1/public/yql?format=json&env=store%3A%2F%2Fdatatables.org%2Falltableswithkeys&q=select%20centroid%20from%20geo.places(1)%20where%20text%3D%22${location}%22',
-}
+};
 
 const verifyLocation = (loc, provider, apiKey, callback=() => {}) => {
     if (!loc) {
@@ -72,53 +70,52 @@ const verifyLocation = (loc, provider, apiKey, callback=() => {}) => {
         .then(json => {
             switch(provider) {
                 case '0':
-		    if (parseInt(json.cod, 10) === 404) {
-			alert('Invalid location');
+            if (parseInt(json.cod, 10) === 404) {
+                alert('Invalid location');
                         callback(false);
-		    } else {
-			alert('Valid location!');
+            } else {
+                alert('Valid location!');
                         callback(true);
-		    }
+            }
                     break;
                 case '1':
-		    if (json.response.error || ! json.current_observation) {
-			if (json.response.error && json.response.error.type === 'keynotfound') {
-			    alert('Invalid WeatherUnderground Key');
+            if (json.response.error || ! json.current_observation) {
+                if (json.response.error && json.response.error.type === 'keynotfound') {
+                    alert('Invalid WeatherUnderground Key');
                             callback(false);
-			} else {
-			    alert('Invalid location');
+                } else {
+                    alert('Invalid location');
                             callback(false);
-			}
-		    } else {
-			alert('Valid location!');
+                }
+            } else {
+                alert('Valid location!');
                         callback(true);
-		    }
+            }
                     break;
                 case '2':
-		    if (json.query.count === 0) {
-			alert('Invalid location');
+            if (json.query.count === 0) {
+                alert('Invalid location');
                         callback(false);
-		    } else {
-			alert('Valid location!');
+            } else {
+                alert('Valid location!');
                         callback(true);
-		    }
+            }
                     break;
                 case '3':
-		    if (json.query.count === 0) {
-			alert('Invalid location');
+            if (json.query.count === 0) {
+                alert('Invalid location');
                         callback(false);
-		    } else {
-			alert('Valid location!');
+            } else {
+                alert('Valid location!');
                         callback(true);
-		    }
+            }
                     break;
                 default:
                     callback(false);
                     break;
             }
-        })
-        ['catch'](ex => {
-            console.log(ex.stack);
+        })['catch'](ex => {
+            console.log(ex.stack); // eslint-disable-line no-console
             callback(false);
         });
 
@@ -140,17 +137,16 @@ const fetchMasterKeyData = (email, pin, callback=() => {}) => {
         })
         .then(json => {
             if (!json.success || !json.keys || !json.keys.weather) {
-                throw new Error("No keys found");
                 callback({});
+                throw new Error("No keys found");
             } else {
                 callback(json.keys.weather);
             }
-        })
-        ['catch'](ex => {
-            console.log(ex.stack);
+        })['catch'](ex => {
+            console.log(ex.stack); // eslint-disable-line no-console
             alert(ex.message);
             callback({});
         });
 };
 
-export { getCurrentVersion, checkForUpdates, verifyLocation, getReturnUrl, getPlatform, fetchMasterKeyData }
+export { getCurrentVersion, checkForUpdates, verifyLocation, getReturnUrl, getPlatform, fetchMasterKeyData };

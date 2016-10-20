@@ -3,12 +3,12 @@ import FastClick from 'react-fastclick-alt';
 import classnames from 'classnames';
 
 class TabContainer extends Component {
-    
+
     constructor(props) {
         super(props);
         this.state = {
             selectedTab: 0
-        }
+        };
     }
 
     onClick(selected) {
@@ -23,7 +23,7 @@ class TabContainer extends Component {
             this.setState({selectedTab: 0});
         }
     }
-    
+
     render() {
         let titles = Object.keys(this.props.tabs).map((title, index) => {
             let titleClasses = classnames({
@@ -55,11 +55,12 @@ class TabContainer extends Component {
 }
 
 TabContainer.propTypes = {
-    
+    onChange: PropTypes.func,
+    tabs: PropTypes.object
 }
 
 TabContainer.defaultProps = {
-    
+
 }
 
 export default TabContainer

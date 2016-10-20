@@ -8,7 +8,7 @@ class TextField extends Component {
         this.onChange = this.onChange.bind(this);
         this.onButtonClick = this.onButtonClick.bind(this);
     }
-    
+
     render() {
         return (
             <Field fieldName={this.props.fieldName} label={this.props.label} labelPosition={this.props.labelPosition} helperText={this.props.helperText}>
@@ -18,7 +18,7 @@ class TextField extends Component {
                         <button className='btn btn-primary field-text--btn' onClick={this.onButtonClick}>{this.props.buttonLabel}</button>
                     : null}
                 </div>
-            </Field>      
+            </Field>
         );
     }
 
@@ -37,11 +37,18 @@ class TextField extends Component {
 }
 
 TextField.propTypes = {
-    
+    fieldName: PropTypes.string,
+    label: PropTypes.string,
+    labelPosition: PropTypes.string,
+    helperText: PropTypes.string,
+    value: PropTypes.string,
+    buttonLabel: PropTypes.string,
+    onChange: PropTypes.func,
+    onButtonClick: PropTypes.func,
 }
 
 TextField.defaultProps = {
-    
+
 }
 
 export default TextField

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { PropTypes } from 'react';
 import Select from 'react-select';
 import Field from './field';
 
@@ -38,6 +38,18 @@ class DropdownField extends React.Component {
             </Field>
         )
     }
+}
+
+DropdownField.propTypes = {
+    selectedItem: PropTypes.string,
+    clearable: PropTypes.bool,
+    options: PropTypes.arrayOf(PropTypes.object),
+    onChange: PropTypes.func,
+    name: PropTypes.string,
+    fieldName: PropTypes.string,
+    label: PropTypes.string,
+    labelPosition: PropTypes.string,
+    searchable: PropTypes.bool,
 }
 
 DropdownField.defaultProps = {

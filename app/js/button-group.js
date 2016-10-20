@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { PropTypes } from 'react';
 import FastClick from 'react-fastclick-alt';
 import Field from './field';
 import classnames from 'classnames';
@@ -14,7 +14,7 @@ class RadioButtonGroup extends React.Component {
             <Field fieldName={this.props.fieldName} label={this.props.label} labelPosition={this.props.labelPosition}>
                 <FastClick><div className='btn-group'>
                     {
-                        this.props.options.map((item, index) => {
+                        this.props.options.map((item) => {
                             let classes = {
                                 'btn btn-outline-primary': true,
                                 'active': this.state.selectedItem === item.value
@@ -43,6 +43,17 @@ class RadioButtonGroup extends React.Component {
             this.props.onChange(index);
         }
     }
+}
+
+RadioButtonGroup.propTypes = {
+    selectedItem: PropTypes.string,
+    options: PropTypes.arrayOf(PropTypes.object),
+    onChange: PropTypes.func,
+    name: PropTypes.string,
+    fieldName: PropTypes.string,
+    label: PropTypes.string,
+    labelPosition: PropTypes.string,
+    size: PropTypes.string,
 }
 
 export default RadioButtonGroup

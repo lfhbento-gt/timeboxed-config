@@ -65,14 +65,14 @@ class ColorPresets extends Component {
                 sunriseColor: '#FFFF00',
                 sunsetColor: '#FFAA00',
             },
-        }
+        };
 
         if (shouldShow(getCurrentVersion(), "3.7", null)) {
             this.defaultPresets['Black and white'] = Object.assign({}, this.defaultPresets['Black and white'], {
                 activeColor: '#FFFFFF',
                 activeBehindColor: '#FFFFFF',
             });
-            this.defaultPresets['Colorful'] = Object.assign({}, this.defaultPresets['Colorful'], {
+            this.defaultPresets.Colorful = Object.assign({}, this.defaultPresets.Colorful, {
                 activeColor: '#AAFFFF',
                 activeBehindColor: '#FFFF00',
             });
@@ -85,7 +85,7 @@ class ColorPresets extends Component {
                 compassColor: '#FFFFFF',
                 secondsColor: '#FFFFFF',
             });
-            this.defaultPresets['Colorful'] = Object.assign({}, this.defaultPresets['Colorful'], {
+            this.defaultPresets.Colorful = Object.assign({}, this.defaultPresets.Colorful, {
                 heartColor: '#AAFFFF',
                 heartColorOff: '#FFFF00',
                 compassColor: '#FFFF00',
@@ -124,7 +124,7 @@ class ColorPresets extends Component {
                 heartColorOff: '#AAAAAA',
                 compassColor: '#00AA00',
                 secondsColor: '#AAAAAA',
-            }
+            };
             this.defaultPresets['Yellow/Orange on black'] = {
                 bgColor: '#000000',
                 hoursColor: '#FFFFFF',
@@ -158,7 +158,7 @@ class ColorPresets extends Component {
                 heartColorOff: '#AAAAAA',
                 compassColor: '#FFAA00',
                 secondsColor: '#AAAAAA',
-            }
+            };
             this.defaultPresets['Blue on black'] = {
                 bgColor: '#000000',
                 hoursColor: '#FFFFFF',
@@ -192,7 +192,7 @@ class ColorPresets extends Component {
                 heartColorOff: '#AAAAAA',
                 compassColor: '#00AAFF',
                 secondsColor: '#AAAAAA',
-            }
+            };
             this.defaultPresets['Red on black'] = {
                 bgColor: '#000000',
                 hoursColor: '#FFFFFF',
@@ -226,7 +226,7 @@ class ColorPresets extends Component {
                 heartColorOff: '#AAAAAA',
                 compassColor: '#FF0055',
                 secondsColor: '#AAAAAA',
-            }
+            };
             this.defaultPresets['Black and white (inverted)'] = {
                 bgColor: '#FFFFFF',
                 hoursColor: '#000000',
@@ -260,7 +260,7 @@ class ColorPresets extends Component {
                 heartColorOff: '#000000',
                 compassColor: '#000000',
                 secondsColor: '#000000',
-            }
+            };
             this.defaultPresets['Green on white'] = {
                 bgColor: '#FFFFFF',
                 hoursColor: '#000000',
@@ -294,7 +294,7 @@ class ColorPresets extends Component {
                 heartColorOff: '#555555',
                 compassColor: '#00AA00',
                 secondsColor: '#555555',
-            }
+            };
             this.defaultPresets['Blue on white'] = {
                 bgColor: '#FFFFFF',
                 hoursColor: '#000000',
@@ -328,7 +328,7 @@ class ColorPresets extends Component {
                 heartColorOff: '#555555',
                 compassColor: '#0055AA',
                 secondsColor: '#555555',
-            }
+            };
         }
 
         let presets = Object.assign({}, this.defaultPresets, this.getStoredPresets());
@@ -343,9 +343,9 @@ class ColorPresets extends Component {
 
         this.storePresets();
     }
-    
+
     getStoredPresets() {
-        let presets = JSON.parse(window.localStorage['presets'] || '{}');
+        let presets = JSON.parse(window.localStorage.presets || '{}');
         let oldPresets = this.getOldPresets();
         return Object.assign({}, oldPresets, presets);
     }
@@ -360,7 +360,7 @@ class ColorPresets extends Component {
 
                     value = value === 'true' || value === 'false' ? JSON.parse(value) : value;
                     value = typeof value === 'string' && value.indexOf('0x') !== -1 ? value.replace('0x', '#') : value;
-                    
+
                     preset[key] = value;
 
                     return preset;
@@ -375,7 +375,7 @@ class ColorPresets extends Component {
     storePresets() {
         let newPresets = Object.assign({}, this.state.presets);
         Object.keys(this.defaultPresets).map(key => delete newPresets[key]);
-        window.localStorage['presets'] = JSON.stringify(newPresets);
+        window.localStorage.presets = JSON.stringify(newPresets);
     }
 
     onClick(preset, e) {
@@ -436,11 +436,12 @@ class ColorPresets extends Component {
 }
 
 ColorPresets.propTypes = {
-    
+    onSelect: PropTypes.func,
+    colors: PropTypes.object,
 }
 
 ColorPresets.defaultProps = {
-    
+
 }
 
 ColorPresets.contextTypes = {

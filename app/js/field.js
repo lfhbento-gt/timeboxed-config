@@ -8,7 +8,7 @@ class Field extends React.Component {
             'field--long-label': this.props.longLabel,
             'field--long': this.props.labelPosition === 'top',
             'field--long-reverse': this.props.labelPosition === 'bottom',
-        })
+        });
         return (
             <div className='field-container'>
                 <div className={classes}>
@@ -22,7 +22,10 @@ class Field extends React.Component {
 
 Field.propTypes = {
     fieldName: PropTypes.string.isRequired,
-    label: PropTypes.string
+    label: PropTypes.string,
+    longLabel: PropTypes.bool,
+    labelPosition: PropTypes.string,
+    children: PropTypes.any,
 }
 
 export default Field

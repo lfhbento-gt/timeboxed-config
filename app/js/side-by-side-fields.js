@@ -1,7 +1,7 @@
 import React, { PropTypes } from 'react';
 
 const SideBySideFields = (props) => {
-  
+
   return (
     <div className='side-by-side'>
         <div className='side-by-side--left'>
@@ -16,11 +16,11 @@ const SideBySideFields = (props) => {
 };
 
 SideBySideFields.propTypes = {
-    
+    children: PropTypes.any,
 }
 
 SideBySideFields.defaultProps = {
-    
+
 }
 
 export default SideBySideFields

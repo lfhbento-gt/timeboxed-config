@@ -13,6 +13,6 @@ SelectableComponent.propTypes = {
     options: React.PropTypes.arrayOf(React.PropTypes.object).isRequired,
     fieldName: React.PropTypes.string.isRequired,
     label: React.PropTypes.string
-}
+};
 
-export { SelectableComponent }
+export { SelectableComponent };

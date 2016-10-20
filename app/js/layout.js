@@ -1,3 +1,4 @@
+/*eslint-disable no-console*/
 import React, { PropTypes, Component } from 'react';
 import ColorPicker from './color-picker';
 import DropdownField from './dropdown';
@@ -166,7 +167,7 @@ class Layout extends Component {
         this.toggleDebug = this.toggleDebug.bind(this);
         this.wipeConfigs = this.wipeConfigs.bind(this);
         this.getMasterKeyData = this.getMasterKeyData.bind(this);
-        
+
         this.modulesAll = [
             {value: '0', label: this._('None')},
             {value: '1', label: this._('Current Weather')},
@@ -180,7 +181,7 @@ class Layout extends Component {
             {value: '11', label: this._('Sunrise')},
             {value: '12', label: this._('Sunset')},
         ];
-        
+
         this.modulesAplite = [
             {value: '0', label: this._('None')},
             {value: '1', label: this._('Current Weather')},
@@ -342,7 +343,7 @@ class Layout extends Component {
                 {value: '17', label: this._('Battery level')},
                 {value: '18', label: this._('Alternate time zone')},
             ];
-            
+
             this.textModulesAplite = [
                 {value: '0', label: this._('None')},
                 {value: '16', label: this._('Seconds')},
@@ -354,7 +355,7 @@ class Layout extends Component {
             this.moduleSleepStateKeys = this.moduleSleepStateKeys.concat(['sleepSlotE', 'sleepSlotF']);
             this.moduleTapStateKeys = this.moduleTapStateKeys.concat(['tapSlotE', 'tapSlotF']);
             this.moduleWristStateKeys = this.moduleWristStateKeys.concat(['wristSlotE', 'wristSlotF']);
-            
+
             this.textModules = this.platform === 'aplite' ? this.textModulesAplite : this.textModulesAll;
         }
 
@@ -428,7 +429,7 @@ class Layout extends Component {
 
 
     getCurrentColors() {
-        return this.colorKeys.reduce((colors, colorKey) => Object.assign({}, colors, {[colorKey]: this.state[colorKey]}), {})
+        return this.colorKeys.reduce((colors, colorKey) => Object.assign({}, colors, {[colorKey]: this.state[colorKey]}), {});
     }
 
     isWeatherEnabled() {
@@ -445,21 +446,21 @@ class Layout extends Component {
             (this.state.showSleep && this.moduleSleepStateKeys.some(key => moduleIndexes.indexOf(this.state[key]) !== -1)) ||
             (this.state.showTap && this.moduleTapStateKeys.some(key => moduleIndexes.indexOf(this.state[key]) !== -1)) ||
             (this.state.showWrist && this.moduleWristStateKeys.some(key => moduleIndexes.indexOf(this.state[key]) !== -1))
-        )
+        );
     }
 
     isEnabledTapWrist(moduleIndexes) {
         return (
             (this.state.showTap && this.moduleTapStateKeys.some(key => moduleIndexes.indexOf(this.state[key]) !== -1)) ||
             (this.state.showWrist && this.moduleWristStateKeys.some(key => moduleIndexes.indexOf(this.state[key]) !== -1))
-        )
+        );
     }
 
     weatherProviderSelected(index) {
         return [index].indexOf(this.state.weatherProvider) !== -1;
     }
 
-    componentWillUpdate(nextProps, nextState) {
+    componentWillUpdate() {
         this._ = getText.bind(this, getLocaleById(this.state.locale));
     }
 
@@ -533,7 +534,7 @@ class Layout extends Component {
                 {name: 'bottom-right-sleep', label: this._('Bottom Right'), slot: 'sleepSlotD', textOnly: false, labelPosition: 'bottom'}],
             ]);
         }
-        
+
         if (state.showTap) {
             modules['Tap'] = this.getModules([
                 [{name: 'top-left-tap', label: this._('Top Left'), slot: 'tapSlotA', textOnly: false, labelPosition: 'top'},
@@ -570,7 +571,7 @@ class Layout extends Component {
                     return <DropdownField fieldName={item.name} label={item.label} options={item.textOnly ? this.textModules : this.modules}
                         searchable={false} clearable={false} labelPosition={item.labelPosition}
                         selectedItem={this.state[item.slot]} onChange={this.onChangeDropdown.bind(this, item.slot)}/>
-            
+
                 })}
             </div>
         );
@@ -744,8 +745,8 @@ class Layout extends Component {
                             <ColorPicker fieldName='dateColor' label={this._('Date color')} color={state.dateColor} onChange={this.onChange.bind(this, 'dateColor')} />
                             <Versioned maxVersion="3.8" version={this.currentVersion}>
                                 <ColorPicker fieldName='altHoursColor' label={this._('Alternate time color')} color={state.altHoursColor} onChange={this.onChange.bind(this, 'altHoursColor')} />
-                                <ColorPicker 
-                                    fieldName='batteryColor' label={this._('Battery/Low Battery color')} color={state.batteryColor} onChange={this.onChange.bind(this, 'batteryColor')} 
+                                <ColorPicker
+                                    fieldName='batteryColor' label={this._('Battery/Low Battery color')} color={state.batteryColor} onChange={this.onChange.bind(this, 'batteryColor')}
                                     secondColor={state.batteryLowColor} onSecondColorChange={this.onChange.bind(this, 'batteryLowColor')} />
                             </Versioned>
                             <Versioned minVersion="4.0" version={this.currentVersion}>
@@ -753,8 +754,8 @@ class Layout extends Component {
                                     <ColorPicker fieldName='altHoursColor' label={this._('Alternate timezone color')} color={state.altHoursColor} onChange={this.onChange.bind(this, 'altHoursColor')} />
                                 : null}
                                 {this.isEnabled(['17']) ?
-                                    <ColorPicker 
-                                        fieldName='batteryColor' label={this._('Battery/Low Battery color')} color={state.batteryColor} onChange={this.onChange.bind(this, 'batteryColor')} 
+                                    <ColorPicker
+                                        fieldName='batteryColor' label={this._('Battery/Low Battery color')} color={state.batteryColor} onChange={this.onChange.bind(this, 'batteryColor')}
                                         secondColor={state.batteryLowColor} onSecondColorChange={this.onChange.bind(this, 'batteryLowColor')} />
                                 : null}
                             </Versioned>
@@ -853,7 +854,7 @@ class Layout extends Component {
                                 <TextField fieldName='weatherKey'
                                     label={this._('API Key')}
                                     value={state.weatherKey}
-                                    onChange={this.onChange.bind(this, 'weatherKey')}/> 
+                                    onChange={this.onChange.bind(this, 'weatherKey')}/>
                                 <HelperText>{this._('<strong>Note:</strong> For WeatherUnderground, you need an API key. Go to <a href="http://www.wunderground.com/weather/api/?apiref=73d2b41a1a02e3bd">wunderground.com</a> to create a free account and get a key and insert it above.')}</HelperText>
                             </div>
                         : null}
@@ -862,7 +863,7 @@ class Layout extends Component {
                                 <TextField fieldName='forecastKey'
                                     label={this._('API Key')}
                                     value={state.forecastKey}
-                                    onChange={this.onChange.bind(this, 'forecastKey')}/> 
+                                    onChange={this.onChange.bind(this, 'forecastKey')}/>
                                 <HelperText>{this._('<strong>Note:</strong> For Dark Sky/Forecast.io, you need an API key. Go to <a href="https://darksky.net/dev/">darksky.net/dev/</a> to create a free account and get a key and insert it above.')}</HelperText>
                             </div>
                         : null}
@@ -903,7 +904,7 @@ class Layout extends Component {
                         <TextField fieldName='masterKeyEmail'
                             label={this._('Email')}
                             value={state.masterKeyEmail}
-                            onChange={this.onChange.bind(this, 'masterKeyEmail')}/> 
+                            onChange={this.onChange.bind(this, 'masterKeyEmail')}/>
                         <TextField fieldName='masterKeyPin'
                             label={this._('Pin')}
                             value={state.masterKeyPin}
@@ -916,7 +917,7 @@ class Layout extends Component {
                             <TextField fieldName='heartLow'
                                 label={this._('Lower heart rate limit')}
                                 value={state.heartLow}
-                                onChange={this.onChange.bind(this, 'heartLow')}/> 
+                                onChange={this.onChange.bind(this, 'heartLow')}/>
                             <TextField fieldName='heartHigh'
                                 label={this._('Upper heart rate limit')}
                                 value={state.heartHigh}
@@ -943,11 +944,12 @@ class Layout extends Component {
 }
 
 Layout.propTypes = {
-    
+    onSubmit: PropTypes.func,
+    state: PropTypes.object,
 }
 
 Layout.defaultProps = {
-    
+
 }
 
 Layout.childContextTypes = {

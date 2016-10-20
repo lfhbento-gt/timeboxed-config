@@ -1,7 +1,6 @@
 import React from 'react';
 import FastClick from 'react-fastclick-alt';
 import Field from './field';
-import classnames from 'classnames';
 import Toggle from 'react-input-toggle/dist/react-input-toggle';
 import 'react-input-toggle/lib/styles/switch.scss';
 
@@ -42,6 +41,7 @@ ToggleField.propTypes = {
     checked: React.PropTypes.bool,
     fieldName: React.PropTypes.string.isRequired,
     label: React.PropTypes.string,
+    onChange: React.PropTypes.func,
 }
 
 ToggleField.defaultProps = {

@@ -1,3 +1,4 @@
+/* eslint-disable react/no-danger */
 import React, { PropTypes } from 'react';
 import classnames from 'classnames';
 
@@ -14,11 +15,12 @@ const HelperText = (props) => {
 };
 
 HelperText.propTypes = {
-    
+    standalone: PropTypes.bool,
+    children: PropTypes.any,
 }
 
 HelperText.defaultProps = {
-    
+
 }
 
 export default HelperText

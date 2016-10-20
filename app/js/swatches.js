@@ -9,18 +9,18 @@ class Swatches extends Component {
 
         this.state = {
             sunny: false
-        }
+        };
 
         this.colors = [
-	    [false, false, '#55ff00', '#aaff55', false, '#ffff55', '#ffffaa', false, false],
-	    [false, '#aaffaa', '#55ff55', '#00ff00', '#aaff00', '#ffff00', '#ffaa55', '#ffaaaa', false],
-	    ['#55ffaa', '#00ff55', '#00aa00', '#55aa00', '#aaaa55', '#aaaa00', '#ffaa00', '#ff5500', '#ff5555'],
-	    ['#aaffff', '#00ffaa', '#00aa55', '#55aa55', '#005500', '#555500', '#aa5500', '#ff0000', '#ff0055'],
-	    [false, '#55aaaa', '#00aaaa', '#005555', '#ffffff', '#000000', '#aa5555', '#aa0000', false],
-	    ['#55ffff', '#00ffff', '#00aaff', '#0055aa', '#aaaaaa', '#555555', '#550000', '#aa0055', '#ff55aa'],
-	    ['#55aaff', '#0055ff', '#0000ff', '#0000aa', '#000055', '#550055', '#aa00aa', '#ff00aa', '#ffaaff'],
-	    [false, '#5555aa', '#5555ff', '#5500ff', '#5500aa', '#aa00ff', '#ff00ff', '#ff55ff', false],
-	    [false, false, false, '#aaaaff', '#aa55ff', '#aa55aa', false, false, false]
+            [false, false, '#55ff00', '#aaff55', false, '#ffff55', '#ffffaa', false, false],
+            [false, '#aaffaa', '#55ff55', '#00ff00', '#aaff00', '#ffff00', '#ffaa55', '#ffaaaa', false],
+            ['#55ffaa', '#00ff55', '#00aa00', '#55aa00', '#aaaa55', '#aaaa00', '#ffaa00', '#ff5500', '#ff5555'],
+            ['#aaffff', '#00ffaa', '#00aa55', '#55aa55', '#005500', '#555500', '#aa5500', '#ff0000', '#ff0055'],
+            [false, '#55aaaa', '#00aaaa', '#005555', '#ffffff', '#000000', '#aa5555', '#aa0000', false],
+            ['#55ffff', '#00ffff', '#00aaff', '#0055aa', '#aaaaaa', '#555555', '#550000', '#aa0055', '#ff55aa'],
+            ['#55aaff', '#0055ff', '#0000ff', '#0000aa', '#000055', '#550055', '#aa00aa', '#ff00aa', '#ffaaff'],
+            [false, '#5555aa', '#5555ff', '#5500ff', '#5500aa', '#aa00ff', '#ff00ff', '#ff55ff', false],
+            [false, false, false, '#aaaaff', '#aa55ff', '#aa55aa', false, false, false]
         ];
 
         this.sunlightColorMap = {
@@ -48,7 +48,7 @@ class Swatches extends Component {
 
         this.onColorTypeChange = this.onColorTypeChange.bind(this);
     }
-    
+
     onColorTypeChange(colorType) {
         this.setState({sunny: parseInt(colorType, 10) === 1});
     }
@@ -75,11 +75,11 @@ class Swatches extends Component {
 }
 
 Swatches.propTypes = {
-    
+    onColorChange: PropTypes.func,
 }
 
 Swatches.defaultProps = {
-    
+
 }
 
 const SwatchRows = (props) => {
@@ -96,6 +96,11 @@ const SwatchRows = (props) => {
             })}
         </div>
     )
+}
+
+SwatchRows.propTypes = {
+    colors: PropTypes.arrayOf(PropTypes.string),
+    onColorChange: PropTypes.func,
 }
 
 class SwatchItem extends Component {
@@ -124,6 +129,12 @@ class SwatchItem extends Component {
             <div className='color-panel--swatch-item' onClick={this.onClickHandler} style={style}></div>
         )
     }
+}
+
+SwatchItem.propTypes = {
+    color: PropTypes.string,
+    hasBorder: PropTypes.bool,
+    onClick: PropTypes.func,
 }
 
 export default Swatches

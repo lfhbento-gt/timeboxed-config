@@ -1,11 +1,6 @@
-var ExtractTextPlugin = require("extract-text-webpack-plugin");
-var HtmlWebpackPlugin = require('html-webpack-plugin');
-var CompressionPlugin = require('compression-webpack-plugin');
+/* globals __dirname, module */
 var webpack = require('webpack');
-var merge = require('webpack-merge');
 var autoprefixer = require('autoprefixer');
-
-var ENV = process.env.NODE_ENV || 'development';
 
 var config = {
     context: __dirname + '/app',
@@ -15,7 +10,7 @@ var config = {
     },
     output: {
         path: __dirname + '/dist',
-        filename: '[name].js' 
+        filename: '[name].js'
     },
     plugins: [
         new webpack.ProvidePlugin({

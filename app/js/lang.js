@@ -23,16 +23,16 @@ const getText = (locale, text, params = {}) => {
         return replaceParams(text, params);
     }
     return replaceParams(lang[text][locale], params);
-}
+};
 
 const replaceParams = (text, params) => {
     return Object.keys(params).reduce((str, key) => {
         return str.replace('${' + key + '}', params[key]);
     }, text);
-}
+};
 
 const getLocaleById = (loc) => {
     return locales[parseInt(loc, 10)];
-}
+};
 
-export { getText, getLocaleById }
+export { getText, getLocaleById };

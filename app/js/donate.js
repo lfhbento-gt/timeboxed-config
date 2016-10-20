@@ -29,7 +29,7 @@ class DonateButton extends React.Component {
         )
     }
 
-};
+}
 
 DonateButton.childContextTypes = {
     locale: PropTypes.string

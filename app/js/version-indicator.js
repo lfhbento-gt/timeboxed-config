@@ -5,12 +5,12 @@ import { getCurrentVersion, checkForUpdates } from './util/util';
 class VersionIndicator extends React.Component {
     constructor(props, context) {
         super(props, context);
-        
+
         this.state = {
             version: getCurrentVersion(),
             latest: getCurrentVersion(),
             hasUpdate: false,
-        }
+        };
         this.onClick = this.onClick.bind(this);
     }
 
@@ -40,14 +40,14 @@ class VersionIndicator extends React.Component {
             </span>
         );
     }
-};
+}
 
 VersionIndicator.propTypes = {
-    
+    onClick: PropTypes.func
 }
 
 VersionIndicator.defaultProps = {
-    
+
 }
 
 VersionIndicator.contextTypes = {

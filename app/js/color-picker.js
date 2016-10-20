@@ -49,7 +49,7 @@ class ColorPicker extends Component {
     togglePanel() {
         this.setState({panelVisible: !this.state.panelVisible});
     }
-    
+
     toggleSecondPanel() {
         this.setState({secondPanelVisible: !this.state.secondPanelVisible});
     }
@@ -89,11 +89,16 @@ class ColorPicker extends Component {
 }
 
 ColorPicker.propTypes = {
-    
+    color: PropTypes.string,
+    secondColor: PropTypes.string,
+    onChange: PropTypes.func,
+    onSecondColorChange: PropTypes.func,
+    fieldName: PropTypes.string,
+    label: PropTypes.string,
 }
 
 ColorPicker.defaultProps = {
-    
+
 }
 
 export default ColorPicker
