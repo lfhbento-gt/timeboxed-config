@@ -42,7 +42,7 @@ class Layout extends Component {
             locale: '0',
             dateFormat: '0',
             textAlign: '2',
-            fontType: '0',
+            fontType: '6',
             enableAdvanced: false,
             weatherProvider: '0',
             useCelsius: false,
