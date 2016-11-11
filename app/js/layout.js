@@ -490,10 +490,10 @@ class Layout extends Component {
                             <SideBySideFields>
                                 <DropdownField fieldName={item[0].name} label={item[0].label} options={item[0].textOnly ? this.textModules : this.modules}
                                     searchable={false} clearable={false} labelPosition={item[0].labelPosition}
-                                    selectedItem={this.state[item[0].slot]} onChange={this.onChangeDropdown.bind(this, item[0].slot)}/>
+                                    selectedItem={this.state[item[0].slot]} onChange={this.onChangeDropdown.bind(this, item[0].slot)} />
                                 <DropdownField fieldName={item[1].name} label={item[1].label} options={item[1].textOnly ? this.textModules : this.modules}
                                     searchable={false} clearable={false} labelPosition={item[1].labelPosition}
-                                    selectedItem={this.state[item[1].slot]} onChange={this.onChangeDropdown.bind(this, item[1].slot)}/>
+                                    selectedItem={this.state[item[1].slot]} onChange={this.onChangeDropdown.bind(this, item[1].slot)} />
                             </SideBySideFields>
                         )
                     } else {
@@ -691,20 +691,20 @@ class Layout extends Component {
                         <div>
                             <ToggleField fieldName='showSleep' label={this._('Enable after wake up mode')} checked={state.showSleep} onChange={this.onChange.bind(this, 'showSleep')} />
                             <HelperText>{this._('If set, the watchface will show the modules under the \'Sleep\' tab from when you\'re asleep until half an hour after you wake up, switching back to the \'Default\' tab after that. This feature requires Pebble Health enabled.')}</HelperText>
+                            <Versioned minVersion="4.0" version={this.currentVersion}>
+                                <ToggleField fieldName='showTap' label={this._('Enable tap mode')} checked={state.showTap} onChange={this.onChange.bind(this, 'showTap')} />
+                                <ToggleField fieldName='showWrist' label={this._('Enable wrist shake mode')} checked={state.showWrist} onChange={this.onChange.bind(this, 'showWrist')} />
+                                <HelperText>{this._('<strong>Experimental features:</strong> If set, the watchface will show the modules under the \'Tap\' tab when you tap the watch screen or the modules under \'Shake\' when you shake your wrist for the amount of time selected below , switching back to the previous view after that. Keep in mind that tap detection is a bit rudimentary because of pebble\'s accelerometer, so light taps might not work. <strong>Enabling these features might drain the battery faster than usual.</strong>')}</HelperText>
+                                {this.state.showTap || this.state.showWrist ?
+                                    <RadioButtonGroup fieldName='tapTime' label='Tap/Shake mode duration' options={[
+                                        {value: '5', label: this._('5s')},
+                                        {value: '7', label: this._('7s')},
+                                        {value: '10', label: this._('10s')},
+                                    ]} selectedItem={state.tapTime} onChange={this.onChange.bind(this, 'tapTime')}/>
+                                : null}
+                            </Versioned>
                         </div>
                     : null}
-                    <Versioned minVersion="4.0" version={this.currentVersion}>
-                        <ToggleField fieldName='showTap' label={this._('Enable tap mode')} checked={state.showTap} onChange={this.onChange.bind(this, 'showTap')} />
-                        <ToggleField fieldName='showWrist' label={this._('Enable wrist shake mode')} checked={state.showWrist} onChange={this.onChange.bind(this, 'showWrist')} />
-                        <HelperText>{this._('<strong>Experimental features:</strong> If set, the watchface will show the modules under the \'Tap\' tab when you tap the watch screen or the modules under \'Shake\' when you shake your wrist for the amount of time selected below , switching back to the previous view after that. Keep in mind that tap detection is a bit rudimentary because of pebble\'s accelerometer, so light taps might not work. <strong>Enabling these features might drain the battery faster than usual.</strong>')}</HelperText>
-                        {this.state.showTap || this.state.showWrist ?
-                            <RadioButtonGroup fieldName='tapTime' label='Tap/Shake mode duration' options={[
-                                {value: '5', label: this._('5s')},
-                                {value: '7', label: this._('7s')},
-                                {value: '10', label: this._('10s')},
-                            ]} selectedItem={state.tapTime} onChange={this.onChange.bind(this, 'tapTime')}/>
-                        : null}
-                    </Versioned>
                 </OptionGroup>
 
                 <Versioned minVersion="4.0" version={this.currentVersion}>
