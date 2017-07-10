@@ -286,7 +286,7 @@ class Layout extends Component {
         this.fonts = [
             {value: '0', label: 'Blocko'},
             {value: '1', label: 'Bloco (big)'},
-            {value: '2', label: 'Pebble fonts'},
+            ...(shouldShow(this.currentVersion, null, "4.0") ? [{value: '2', label: 'Pebble fonts'}] : []),
             {value: '3', label: 'Archivo'},
             {value: '4', label: 'Din'},
             {value: '5', label: 'Prototype'},
@@ -319,7 +319,7 @@ class Layout extends Component {
         if (shouldShow(this.currentVersion, "4.0", null)) {
             this.modulesAll = this.modulesAll.concat([
                 {value: '14', label: this._('Heart rate')},
-                {value: '15', label: this._('Compass')},
+                ...(this.platform !== 'diorite' ? [{value: '15', label: this._('Compass')}] : []),
                 {value: '16', label: this._('Seconds')},
                 {value: '17', label: this._('Battery level')},
             ]);
