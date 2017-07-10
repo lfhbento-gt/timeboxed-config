@@ -54,6 +54,7 @@ class Layout extends Component {
             showDebug: false,
             quickview: true,
             dateSeparator: '1',
+            muteOnQuiet: false,
         };
 
         this.defaultColors = {
@@ -211,10 +212,12 @@ class Layout extends Component {
             {value: 'vet|-4:30', label: '(GMT -4:30) VET: Venezuela'},
             {value: 'edt|-4:00', label: '(GMT -4) EDT: Eastern Daylight Time'},
             {value: 'ast|-4:00', label: '(GMT -4) AST: Atlantic Standard Time'},
+            {value: 'nst|-3:30', label: '(GMT -3:30) NST: Newfoundland Time'},
             {value: 'adt|-3:00', label: '(GMT -3) ADT: Atlantic Daylight Time'},
             {value: 'art|-3:00', label: '(GMT -3) ART: Argentina'},
             {value: 'brt|-3:00', label: '(GMT -3) BRT: Brazil'},
             {value: 'wgt|-3:00', label: '(GMT -3) WGT: West Greenland'},
+            {value: 'ndt|-2:30', label: '(GMT -2:30) NST: Newfoundland Daylight Time'},
             {value: 'wgst|-2:00', label: '(GMT -2) WGST: West Greenland Summer Time'},
             {value: 'brst|-2:00', label: '(GMT -2) BRST: Brazil Summer Time'},
             {value: 'egt|-1:00', label: '(GMT -1) EGT: East Greenland'},
@@ -668,6 +671,9 @@ class Layout extends Component {
                     <DropdownField fieldName='fontType' label='Font' options={this.fonts} selectedItem={state.fontType} onChange={this.onChangeDropdown.bind(this, 'fontType')}/>
                     <ToggleField fieldName='leadingZero' label={this._('Hours with leading zero')} checked={state.leadingZero} onChange={this.onChange.bind(this, 'leadingZero')}/>
                     <ToggleField fieldName='bluetoothDisconnect' label={this._('Vibrate on Bluetooth disconnect')} checked={state.bluetoothDisconnect} onChange={this.onChange.bind(this, 'bluetoothDisconnect')}/>
+                    <Versioned minVersion="4.2" version={this.currentVersion}>
+                      <ToggleField fieldName='muteOnQuiet' label={this._('Mute vibrations on Quiet Mode')} checked={state.muteOnQuiet} onChange={this.onChange.bind(this, 'muteOnQuiet')}/>
+                    </Versioned>
                     <ToggleField fieldName='updates' label={this._('Check for updates')} checked={state.update} onChange={this.onChange.bind(this, 'update')} />
 
                     {this.platform !== 'chalk' && this.plaform !== 'aplite' ?
