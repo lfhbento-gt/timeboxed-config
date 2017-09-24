@@ -6,11 +6,8 @@ import ColorPresets from './color-presets';
 import DonateButton from './donate';
 import DropdownField from './dropdown';
 import HelperText from './helper-text';
-import RadioButtonGroup from './button-group';
-import '../css/main.scss';
-import 'react-select/scss/default.scss';
-import 'bootstrap/scss/bootstrap-flex.scss';
 import OptionGroup from './option-group';
+import RadioButtonGroup from './button-group';
 import React, { Component, PropTypes } from 'react';
 import SideBySideFields from './side-by-side-fields';
 import TabContainer from './tabs';
@@ -18,6 +15,13 @@ import TextField from './text-field';
 import ToggleField from './toggle';
 import VersionIndicator from './version-indicator';
 import Versioned, { shouldShow } from './versioned';
+
+// eslint-disable-next-line
+import 'react-select/scss/default.scss';
+// eslint-disable-next-line
+import 'bootstrap/scss/bootstrap-flex.scss';
+// eslint-disable-next-line
+import '../css/main.scss';
 
 class Layout extends Component {
     constructor(props) {
