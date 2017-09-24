@@ -1,18 +1,25 @@
--   repo: git://github.com/pre-commit/pre-commit-hooks
-    sha: 4c90c9557da7c0d695d6a729bae8b1de4e496cbf
-    hooks:
-    -   id: trailing-whitespace
--   repo: git://github.com/pre-commit/mirrors-eslint
-    sha: v3.7.0
-    hooks:
-    -   id: eslint
-        additional_dependencies: ['babel-eslint@7.0.0', 'eslint-plugin-react@6.4.1']
--   repo: git://github.com/pre-commit/mirrors-fixmyjs
-    sha: a85f43b8e3ccc30438770cc0b1c4f9809a10afb4
-    hooks:
-    -   id: fixmyjs
-        args:
-        - -l
-        - -c
-        - .jshintrc
-        exclude: (config\/js\/slate.*|config\/v1.*)
+repos:
+- repo: git://github.com/pre-commit/pre-commit-hooks
+  sha: v0.9.4
+  hooks:
+  -   id: trailing-whitespace
+  -   id: end-of-file-fixer
+- repo: git://github.com/pre-commit/mirrors-eslint
+  sha: v4.1.1
+  hooks:
+  - id: eslint
+    additional_dependencies: [
+      'eslint',
+      'babel-eslint',
+      'eslint-plugin-babel',
+      'eslint-plugin-react',
+      'eslint-plugin-promise',
+      'eslint-plugin-prefer-object-spread',
+      'eslint-plugin-no-loops',
+      'eslint-plugin-sort-imports-es6-autofix'
+    ]
+    args: [--quiet]
+- repo: git://github.com/lfhbento/mirrors-prettier-eslint-cli
+  sha: 2b0f6f85118b95ec3b22e49387e5136410eb7c57
+  hooks:
+  -   id: prettier-eslint
