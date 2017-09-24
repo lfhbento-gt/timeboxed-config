@@ -20,6 +20,6 @@ repos:
     ]
     args: [--quiet]
 - repo: git://github.com/lfhbento/mirrors-prettier-eslint-cli
-  sha: 2b0f6f85118b95ec3b22e49387e5136410eb7c57
+  sha: v4.1.1
   hooks:
   -   id: prettier-eslint
