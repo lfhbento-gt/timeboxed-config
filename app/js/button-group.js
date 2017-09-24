@@ -1,23 +1,25 @@
-import React, { PropTypes } from 'react';
 import FastClick from 'react-fastclick-alt';
 import Field from './field';
+import React, { PropTypes } from 'react';
 import classnames from 'classnames';
 
 class RadioButtonGroup extends React.Component {
     constructor(props) {
         super(props);
-        this.state = {selectedItem: (typeof props.selectedItem !== 'undefined' ? props.selectedItem : props.options['0'].value)};
+        this.state = {
+            selectedItem: typeof props.selectedItem !== 'undefined' ? props.selectedItem : props.options['0'].value,
+        };
     }
 
     render() {
         return (
             <Field fieldName={this.props.fieldName} label={this.props.label} labelPosition={this.props.labelPosition}>
-                <FastClick><div className='btn-group'>
-                    {
-                        this.props.options.map((item) => {
+                <FastClick>
+                    <div className="btn-group">
+                        {this.props.options.map((item) => {
                             let classes = {
                                 'btn btn-outline-primary': true,
-                                'active': this.state.selectedItem === item.value
+                                active: this.state.selectedItem === item.value,
                             };
                             if (this.props.size) {
                                 classes[this.props.size] = true;
@@ -30,15 +32,15 @@ class RadioButtonGroup extends React.Component {
                                     {item.label}
                                 </button>
                             );
-                        })
-                    }
-                </div></FastClick>
+                        })}
+                    </div>
+                </FastClick>
             </Field>
         );
     }
 
     toggleButton(index) {
-        this.setState({selectedItem: index});
+        this.setState({ selectedItem: index });
         if (this.props.onChange) {
             this.props.onChange(index);
         }
@@ -54,6 +56,6 @@ RadioButtonGroup.propTypes = {
     label: PropTypes.string,
     labelPosition: PropTypes.string,
     size: PropTypes.string,
-}
+};
 
-export default RadioButtonGroup
+export default RadioButtonGroup;

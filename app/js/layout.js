@@ -15,7 +15,6 @@ import React, { Component, PropTypes } from 'react';
 import SideBySideFields from './side-by-side-fields';
 import TabContainer from './tabs';
 import TextField from './text-field';
-
 import ToggleField from './toggle';
 import VersionIndicator from './version-indicator';
 import Versioned, { shouldShow } from './versioned';
@@ -799,6 +798,7 @@ class Layout extends Component {
                 {options.map((item) => {
                     return (
                         <DropdownField
+                            key={item.label}
                             fieldName={item.name}
                             label={item.label}
                             options={item.textOnly ? this.textModules : this.modules}
@@ -1031,7 +1031,7 @@ class Layout extends Component {
                 <h1 className="title">Timeboxed</h1>
                 <VersionIndicator onClick={this.toggleDebug} />
 
-                {state.showDebug ? (
+                {state.showDebug && (
                     <OptionGroup title={this._('Debug')}>
                         <ul className="debug-list">
                             {Object.keys(window.localStorage).map((key) => {
@@ -1046,10 +1046,10 @@ class Layout extends Component {
                             Reset configs
                         </button>
                     </OptionGroup>
-                ) : null}
+                )}
 
                 <OptionGroup title={this._('General')}>
-                    {this.platform !== 'chalk' ? (
+                    {this.platform !== 'chalk' && (
                         <RadioButtonGroup
                             fieldName="textAlign"
                             label="Text Align"
@@ -1061,7 +1061,7 @@ class Layout extends Component {
                             selectedItem={state.textAlign}
                             onChange={this.onChange.bind(this, 'textAlign')}
                         />
-                    ) : null}
+                    )}
                     <DropdownField
                         fieldName="fontType"
                         label="Font"
@@ -1096,21 +1096,22 @@ class Layout extends Component {
                         onChange={this.onChange.bind(this, 'update')}
                     />
 
-                    {this.platform !== 'chalk' && this.plaform !== 'aplite' ? (
-                        <div>
-                            <ToggleField
-                                fieldName="quickview"
-                                label={this._('Enable Quickview mode')}
-                                checked={state.quickview}
-                                onChange={this.onChange.bind(this, 'quickview')}
-                            />
-                            <HelperText>
-                                {this._(
-                                    'Hides additional timezone and battery level and adjusts the layout when a timeline event is on the screen.'
-                                )}
-                            </HelperText>
-                        </div>
-                    ) : null}
+                    {this.platform !== 'chalk' &&
+                        this.plaform !== 'aplite' && (
+                            <div>
+                                <ToggleField
+                                    fieldName="quickview"
+                                    label={this._('Enable Quickview mode')}
+                                    checked={state.quickview}
+                                    onChange={this.onChange.bind(this, 'quickview')}
+                                />
+                                <HelperText>
+                                    {this._(
+                                        'Hides additional timezone and battery level and adjusts the layout when a timeline event is on the screen.'
+                                    )}
+                                </HelperText>
+                            </div>
+                        )}
 
                     <Versioned maxVersion="3.8" version={this.currentVersion}>
                         <DropdownField
@@ -1129,14 +1130,15 @@ class Layout extends Component {
                     <TabContainer
                         tabs={this.platform === 'chalk' ? this.getEnabledModulesRound() : this.getEnabledModules()}
                     />
-                    {this.isEnabled(['15']) && !this.isEnabledTapWrist(['15']) ? (
-                        <HelperText standalone={true}>
-                            {this._(
-                                '<strong>Alert:</strong> Keeping the compass enabled all the time could drain battery faster. It\'s recommend setting it as a \'Tap\' or \'Shake\' module (enable them below).'
-                            )}
-                        </HelperText>
-                    ) : null}
-                    {this.platform !== 'aplite' ? (
+                    {this.isEnabled(['15']) &&
+                        !this.isEnabledTapWrist(['15']) && (
+                            <HelperText standalone={true}>
+                                {this._(
+                                    '<strong>Alert:</strong> Keeping the compass enabled all the time could drain battery faster. It\'s recommend setting it as a \'Tap\' or \'Shake\' module (enable them below).'
+                                )}
+                            </HelperText>
+                        )}
+                    {this.platform !== 'aplite' && (
                         <div>
                             <ToggleField
                                 fieldName="showSleep"
@@ -1167,7 +1169,7 @@ class Layout extends Component {
                                         '<strong>Experimental features:</strong> If set, the watchface will show the modules under the \'Tap\' tab when you tap the watch screen or the modules under \'Shake\' when you shake your wrist for the amount of time selected below , switching back to the previous view after that. Keep in mind that tap detection is a bit rudimentary because of pebble\'s accelerometer, so light taps might not work. <strong>Enabling these features might drain the battery faster than usual.</strong>'
                                     )}
                                 </HelperText>
-                                {this.state.showTap || this.state.showWrist ? (
+                                {(this.state.showTap || this.state.showWrist) && (
                                     <RadioButtonGroup
                                         fieldName="tapTime"
                                         label="Tap/Shake mode duration"
@@ -1179,14 +1181,14 @@ class Layout extends Component {
                                         selectedItem={state.tapTime}
                                         onChange={this.onChange.bind(this, 'tapTime')}
                                     />
-                                ) : null}
+                                )}
                             </Versioned>
                         </div>
-                    ) : null}
+                    )}
                 </OptionGroup>
 
                 <Versioned minVersion="4.0" version={this.currentVersion}>
-                    {this.isEnabled(['18']) ? (
+                    {this.isEnabled(['18']) && (
                         <OptionGroup title={this._('Alternate Timezone')}>
                             <DropdownField
                                 fieldName="timezones"
@@ -1198,7 +1200,7 @@ class Layout extends Component {
                                 onChange={this.onChangeDropdown.bind(this, 'timezones')}
                             />
                         </OptionGroup>
-                    ) : null}
+                    )}
                 </Versioned>
 
                 <OptionGroup title={this._('Localization')}>
@@ -1273,7 +1275,7 @@ class Layout extends Component {
                             'Enables specific color configuration for watchface items. If disabled, all text will have the same color as the selection for \'Foreground Color\' above. This also lets you save and load color presets.'
                         )}
                     </HelperText>
-                    {state.enableAdvanced ? (
+                    {state.enableAdvanced && (
                         <div>
                             <ColorPicker
                                 fieldName="dateColor"
@@ -1298,15 +1300,15 @@ class Layout extends Component {
                                 />
                             </Versioned>
                             <Versioned minVersion="4.0" version={this.currentVersion}>
-                                {this.isEnabled(['18']) ? (
+                                {this.isEnabled(['18']) && (
                                     <ColorPicker
                                         fieldName="altHoursColor"
                                         label={this._('Alternate timezone color')}
                                         color={state.altHoursColor}
                                         onChange={this.onChange.bind(this, 'altHoursColor')}
                                     />
-                                ) : null}
-                                {this.isEnabled(['17']) ? (
+                                )}
+                                {this.isEnabled(['17']) && (
                                     <ColorPicker
                                         fieldName="batteryColor"
                                         label={this._('Battery/Low Battery color')}
@@ -1315,7 +1317,7 @@ class Layout extends Component {
                                         secondColor={state.batteryLowColor}
                                         onSecondColorChange={this.onChange.bind(this, 'batteryLowColor')}
                                     />
-                                ) : null}
+                                )}
                             </Versioned>
                             <ColorPicker
                                 fieldName="bluetoothColor"
@@ -1329,7 +1331,7 @@ class Layout extends Component {
                                 color={state.updateColor}
                                 onChange={this.onChange.bind(this, 'updateColor')}
                             />
-                            {this.isEnabled(['1']) ? (
+                            {this.isEnabled(['1']) && (
                                 <ColorPicker
                                     fieldName="weatherColor"
                                     label={this._('Weather icon/temperature')}
@@ -1338,8 +1340,8 @@ class Layout extends Component {
                                     secondColor={state.tempColor}
                                     onSecondColorChange={this.onChange.bind(this, 'tempColor')}
                                 />
-                            ) : null}
-                            {this.isEnabled(['2']) ? (
+                            )}
+                            {this.isEnabled(['2']) && (
                                 <ColorPicker
                                     fieldName="minMaxTemp"
                                     label={this._('Min/Max temperature')}
@@ -1348,8 +1350,8 @@ class Layout extends Component {
                                     secondColor={state.maxColor}
                                     onSecondColorChange={this.onChange.bind(this, 'maxColor')}
                                 />
-                            ) : null}
-                            {this.isEnabled(['3']) ? (
+                            )}
+                            {this.isEnabled(['3']) && (
                                 <ColorPicker
                                     fieldName="stepsColor"
                                     label={this._('Steps/falling behind')}
@@ -1358,8 +1360,8 @@ class Layout extends Component {
                                     secondColor={state.stepsBehindColor}
                                     onSecondColorChange={this.onChange.bind(this, 'stepsBehindColor')}
                                 />
-                            ) : null}
-                            {this.isEnabled(['4']) ? (
+                            )}
+                            {this.isEnabled(['4']) && (
                                 <ColorPicker
                                     fieldName="distColor"
                                     label={this._('Distance/falling behind')}
@@ -1368,8 +1370,8 @@ class Layout extends Component {
                                     secondColor={state.distBehindColor}
                                     onSecondColorChange={this.onChange.bind(this, 'distBehindColor')}
                                 />
-                            ) : null}
-                            {this.isEnabled(['5']) ? (
+                            )}
+                            {this.isEnabled(['5']) && (
                                 <ColorPicker
                                     fieldName="calColor"
                                     label={this._('Calories/falling behind')}
@@ -1378,8 +1380,8 @@ class Layout extends Component {
                                     secondColor={state.calBehindColor}
                                     onSecondColorChange={this.onChange.bind(this, 'calBehindColor')}
                                 />
-                            ) : null}
-                            {this.isEnabled(['6']) ? (
+                            )}
+                            {this.isEnabled(['6']) && (
                                 <ColorPicker
                                     fieldName="sleepColor"
                                     label={this._('Sleep/falling behind')}
@@ -1388,8 +1390,8 @@ class Layout extends Component {
                                     secondColor={state.sleepBehindColor}
                                     onSecondColorChange={this.onChange.bind(this, 'sleepBehindColor')}
                                 />
-                            ) : null}
-                            {this.isEnabled(['7']) ? (
+                            )}
+                            {this.isEnabled(['7']) && (
                                 <ColorPicker
                                     fieldName="deepColor"
                                     label={this._('Deep sleep/falling behind')}
@@ -1398,8 +1400,8 @@ class Layout extends Component {
                                     secondColor={state.deepBehindColor}
                                     onSecondColorChange={this.onChange.bind(this, 'deepBehindColor')}
                                 />
-                            ) : null}
-                            {this.isEnabled(['8']) ? (
+                            )}
+                            {this.isEnabled(['8']) && (
                                 <ColorPicker
                                     fieldName="windSpeedColor"
                                     label={this._('Wind direction/speed')}
@@ -1408,25 +1410,25 @@ class Layout extends Component {
                                     secondColor={state.windSpeedColor}
                                     onSecondColorChange={this.onChange.bind(this, 'windSpeedColor')}
                                 />
-                            ) : null}
-                            {this.isEnabled(['11']) ? (
+                            )}
+                            {this.isEnabled(['11']) && (
                                 <ColorPicker
                                     fieldName="sunriseColor"
                                     label={this._('Sunrise')}
                                     color={state.sunriseColor}
                                     onChange={this.onChange.bind(this, 'sunriseColor')}
                                 />
-                            ) : null}
-                            {this.isEnabled(['12']) ? (
+                            )}
+                            {this.isEnabled(['12']) && (
                                 <ColorPicker
                                     fieldName="sunsetColor"
                                     label={this._('Sunset')}
                                     color={state.sunsetColor}
                                     onChange={this.onChange.bind(this, 'sunsetColor')}
                                 />
-                            ) : null}
+                            )}
                             <Versioned minVersion="3.7" version={this.currentVersion}>
-                                {this.isEnabled(['13']) ? (
+                                {this.isEnabled(['13']) && (
                                     <ColorPicker
                                         fieldName="activeColor"
                                         label={this._('Active time/falling behind')}
@@ -1435,10 +1437,10 @@ class Layout extends Component {
                                         secondColor={state.activeBehindColor}
                                         onSecondColorChange={this.onChange.bind(this, 'activeBehindColor')}
                                     />
-                                ) : null}
+                                )}
                             </Versioned>
                             <Versioned minVersion="4.0" version={this.currentVersion}>
-                                {this.isEnabled(['14']) ? (
+                                {this.isEnabled(['14']) && (
                                     <div>
                                         <ColorPicker
                                             fieldName="heartColor"
@@ -1452,35 +1454,35 @@ class Layout extends Component {
                                             {this._('Set upper and lower limits in the health section below.')}
                                         </HelperText>
                                     </div>
-                                ) : null}
-                                {this.isEnabled(['15']) ? (
+                                )}
+                                {this.isEnabled(['15']) && (
                                     <ColorPicker
                                         fieldName="compassColor"
                                         label={this._('Compass')}
                                         color={state.compassColor}
                                         onChange={this.onChange.bind(this, 'compassColor')}
                                     />
-                                ) : null}
-                                {this.isEnabled(['16']) ? (
+                                )}
+                                {this.isEnabled(['16']) && (
                                     <ColorPicker
                                         fieldName="secondsColor"
                                         label={this._('Seconds')}
                                         color={state.secondsColor}
                                         onChange={this.onChange.bind(this, 'secondsColor')}
                                     />
-                                ) : null}
+                                )}
                             </Versioned>
                         </div>
-                    ) : null}
+                    )}
                 </OptionGroup>
 
-                {state.enableAdvanced ? (
+                {state.enableAdvanced && (
                     <OptionGroup title={this._('Color Presets')}>
                         <ColorPresets colors={this.getCurrentColors()} onSelect={this.onPresetSelect} />
                     </OptionGroup>
-                ) : null}
+                )}
 
-                {this.isWeatherEnabled() ? (
+                {this.isWeatherEnabled() && (
                     <OptionGroup title={this._('Weather')}>
                         <DropdownField
                             fieldName="provider"
@@ -1495,7 +1497,7 @@ class Layout extends Component {
                             onChange={this.onChangeDropdown.bind(this, 'weatherProvider')}
                         />
 
-                        {this.weatherProviderSelected('1') ? (
+                        {this.weatherProviderSelected('1') && (
                             <div>
                                 <TextField
                                     fieldName="weatherKey"
@@ -1509,8 +1511,8 @@ class Layout extends Component {
                                     )}
                                 </HelperText>
                             </div>
-                        ) : null}
-                        {this.weatherProviderSelected('3') ? (
+                        )}
+                        {this.weatherProviderSelected('3') && (
                             <div>
                                 <TextField
                                     fieldName="forecastKey"
@@ -1524,19 +1526,19 @@ class Layout extends Component {
                                     )}
                                 </HelperText>
                             </div>
-                        ) : null}
+                        )}
 
-                        {this.isEnabled(['1', '2']) ? (
+                        {this.isEnabled(['1', '2']) && (
                             <ToggleField
                                 fieldName="useCelsius"
                                 label={this._('Use Celsius')}
                                 checked={state.useCelsius}
                                 onChange={this.onChange.bind(this, 'useCelsius')}
                             />
-                        ) : null}
+                        )}
 
                         <Versioned minVersion="4.0" version={this.currentVersion}>
-                            {this.isEnabled(['1', '2', '8', '11', '12']) ? (
+                            {this.isEnabled(['1', '2', '8', '11', '12']) && (
                                 <RadioButtonGroup
                                     fieldName="weatherTime"
                                     label={this._('Weather refresh interval')}
@@ -1548,10 +1550,10 @@ class Layout extends Component {
                                     selectedItem={state.weatherTime}
                                     onChange={this.onChange.bind(this, 'weatherTime')}
                                 />
-                            ) : null}
+                            )}
                         </Versioned>
 
-                        {this.isEnabled(['8']) ? (
+                        {this.isEnabled(['8']) && (
                             <RadioButtonGroup
                                 fieldName="speedUnit"
                                 label={this._('Speed unit')}
@@ -1563,7 +1565,7 @@ class Layout extends Component {
                                 selectedItem={state.speedUnit}
                                 onChange={this.onChange.bind(this, 'speedUnit')}
                             />
-                        ) : null}
+                        )}
 
                         <TextField
                             fieldName="overrideLocation"
@@ -1580,7 +1582,7 @@ class Layout extends Component {
                             )}
                         </HelperText>
                     </OptionGroup>
-                ) : null}
+                )}
 
                 <Versioned minVersion="4.0" version={this.currentVersion}>
                     <OptionGroup title={this._('Master Key (pmkey.xyz)')}>
@@ -1605,7 +1607,7 @@ class Layout extends Component {
                             {this._('Retrieve API keys')}
                         </button>
                     </OptionGroup>
-                    {this.isEnabled(['14']) ? (
+                    {this.isEnabled(['14']) && (
                         <OptionGroup title={this._('Health')}>
                             <TextField
                                 fieldName="heartLow"
@@ -1625,7 +1627,7 @@ class Layout extends Component {
                                 )}
                             </HelperText>
                         </OptionGroup>
-                    ) : null}
+                    )}
                 </Versioned>
 
                 <div className="block--footer">

@@ -1,8 +1,8 @@
-import React, { PropTypes, Component } from 'react';
-import TextField from './text-field';
-import { getText } from './lang';
 import { getCurrentVersion } from './util/util';
+import { getText } from './lang';
 import { shouldShow } from './versioned';
+import React, { Component, PropTypes } from 'react';
+import TextField from './text-field';
 
 class ColorPresets extends Component {
     constructor(props, context) {
@@ -37,7 +37,7 @@ class ColorPresets extends Component {
                 sunriseColor: '#FFFFFF',
                 sunsetColor: '#FFFFFF',
             },
-            'Colorful': {
+            Colorful: {
                 bgColor: '#000055',
                 hoursColor: '#FFFFFF',
                 dateColor: '#AAFFFF',
@@ -67,30 +67,42 @@ class ColorPresets extends Component {
             },
         };
 
-        if (shouldShow(getCurrentVersion(), "3.7", null)) {
-            this.defaultPresets['Black and white'] = Object.assign({}, this.defaultPresets['Black and white'], {
-                activeColor: '#FFFFFF',
-                activeBehindColor: '#FFFFFF',
-            });
-            this.defaultPresets.Colorful = Object.assign({}, this.defaultPresets.Colorful, {
-                activeColor: '#AAFFFF',
-                activeBehindColor: '#FFFF00',
-            });
+        if (shouldShow(getCurrentVersion(), '3.7', null)) {
+            this.defaultPresets['Black and white'] = {
+                ...this.defaultPresets['Black and white'],
+                ...{
+                    activeColor: '#FFFFFF',
+                    activeBehindColor: '#FFFFFF',
+                },
+            };
+            this.defaultPresets.Colorful = {
+                ...this.defaultPresets.Colorful,
+                ...{
+                    activeColor: '#AAFFFF',
+                    activeBehindColor: '#FFFF00',
+                },
+            };
         }
 
-        if (shouldShow(getCurrentVersion(), "4.0", null)) {
-            this.defaultPresets['Black and white'] = Object.assign({}, this.defaultPresets['Black and white'], {
-                heartColor: '#FFFFFF',
-                heartColorOff: '#FFFFFF',
-                compassColor: '#FFFFFF',
-                secondsColor: '#FFFFFF',
-            });
-            this.defaultPresets.Colorful = Object.assign({}, this.defaultPresets.Colorful, {
-                heartColor: '#AAFFFF',
-                heartColorOff: '#FFFF00',
-                compassColor: '#FFFF00',
-                secondsColor: '#AAAAAA',
-            });
+        if (shouldShow(getCurrentVersion(), '4.0', null)) {
+            this.defaultPresets['Black and white'] = {
+                ...this.defaultPresets['Black and white'],
+                ...{
+                    heartColor: '#FFFFFF',
+                    heartColorOff: '#FFFFFF',
+                    compassColor: '#FFFFFF',
+                    secondsColor: '#FFFFFF',
+                },
+            };
+            this.defaultPresets.Colorful = {
+                ...this.defaultPresets.Colorful,
+                ...{
+                    heartColor: '#AAFFFF',
+                    heartColorOff: '#FFFF00',
+                    compassColor: '#FFFF00',
+                    secondsColor: '#AAAAAA',
+                },
+            };
             this.defaultPresets['Green on black'] = {
                 bgColor: '#000000',
                 hoursColor: '#FFFFFF',
@@ -331,7 +343,7 @@ class ColorPresets extends Component {
             };
         }
 
-        let presets = Object.assign({}, this.defaultPresets, this.getStoredPresets());
+        let presets = { ...this.defaultPresets, ...this.getStoredPresets() };
 
         this.state = {
             presets: presets,
@@ -347,7 +359,7 @@ class ColorPresets extends Component {
     getStoredPresets() {
         let presets = JSON.parse(window.localStorage.presets || '{}');
         let oldPresets = this.getOldPresets();
-        return Object.assign({}, oldPresets, presets);
+        return { ...oldPresets, ...presets };
     }
 
     getOldPresets() {
@@ -373,8 +385,8 @@ class ColorPresets extends Component {
     }
 
     storePresets() {
-        let newPresets = Object.assign({}, this.state.presets);
-        Object.keys(this.defaultPresets).map(key => delete newPresets[key]);
+        let newPresets = { ...this.state.presets };
+        Object.keys(this.defaultPresets).map((key) => delete newPresets[key]);
         window.localStorage.presets = JSON.stringify(newPresets);
     }
 
@@ -389,24 +401,24 @@ class ColorPresets extends Component {
 
     onAddClick(name) {
         if (Object.keys(this.defaultPresets).indexOf(name) !== -1) {
-            alert(this._('You can\'t replace default ${name} preset. Choose a different name :)', {name}));
+            alert(this._('You can\'t replace default ${name} preset. Choose a different name :)', { name }));
             return;
         }
         if (Object.keys(this.state.presets).indexOf(name) !== -1) {
-            if (!confirm(this._('This will replace the ${name} preset. Continue?', {name}))) {
+            if (!confirm(this._('This will replace the ${name} preset. Continue?', { name }))) {
                 return;
             }
         }
-        let presets = Object.assign({}, this.state.presets, {[name]: this.props.colors});
-        this.setState({presets: presets});
+        let presets = { ...this.state.presets, ...{ [name]: this.props.colors } };
+        this.setState({ presets: presets });
         window.setTimeout(this.storePresets, 0);
     }
 
     onRemoveClick(name, e) {
-        if (confirm(this._('Remove the preset ${name}?', {name}))) {
-            let presets = Object.assign({}, this.state.presets);
+        if (confirm(this._('Remove the preset ${name}?', { name }))) {
+            let presets = { ...this.state.presets };
             delete presets[name];
-            this.setState({presets: presets});
+            this.setState({ presets: presets });
             window.setTimeout(this.storePresets, 0);
         }
         e.stopPropagation();
@@ -415,21 +427,30 @@ class ColorPresets extends Component {
     render() {
         return (
             <div>
-                <div className='list-group'>
-                    {Object.keys(this.state.presets).sort().map(key => {
-                        return (
-                            <li className='list-group-item' key={key} onClick={this.onClick.bind(this, key)}>
-                                {key}
-                                {Object.keys(this.defaultPresets).indexOf(key) === -1 ?
-                                    <span className='pull-xs-right remove-preset' onClick={this.onRemoveClick.bind(this, key)}>&#x2573;</span>
-                                : null}
-                            </li>
-                        )
-                    })}
+                <div className="list-group">
+                    {Object.keys(this.state.presets)
+                        .sort()
+                        .map((key) => {
+                            return (
+                                <li className="list-group-item" key={key} onClick={this.onClick.bind(this, key)}>
+                                    {key}
+                                    {Object.keys(this.defaultPresets).indexOf(key) === -1 ? (
+                                        <span
+                                            className="pull-xs-right remove-preset"
+                                            onClick={this.onRemoveClick.bind(this, key)}>
+                                            &#x2573;
+                                        </span>
+                                    ) : null}
+                                </li>
+                            );
+                        })}
                 </div>
-                <TextField fieldName='presetName' buttonLabel={this._('Add New')}
-                    value=''
-                    onButtonClick={this.onAddClick}/>
+                <TextField
+                    fieldName="presetName"
+                    buttonLabel={this._('Add New')}
+                    value=""
+                    onButtonClick={this.onAddClick}
+                />
             </div>
         );
     }
@@ -438,14 +459,12 @@ class ColorPresets extends Component {
 ColorPresets.propTypes = {
     onSelect: PropTypes.func,
     colors: PropTypes.object,
-}
+};
 
-ColorPresets.defaultProps = {
-
-}
+ColorPresets.defaultProps = {};
 
 ColorPresets.contextTypes = {
-    locale: PropTypes.string
-}
+    locale: PropTypes.string,
+};
 
-export default ColorPresets
+export default ColorPresets;

@@ -1,12 +1,15 @@
+import Field from './field';
 import React, { PropTypes } from 'react';
 import Select from 'react-select';
-import Field from './field';
 
 class DropdownField extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            selectedItem: (typeof props.selectedItem !== 'undefined' ? props.selectedItem : (props.clearable ? null : props.options[0].value))
+            selectedItem:
+                typeof props.selectedItem !== 'undefined'
+                    ? props.selectedItem
+                    : props.clearable ? null : props.options[0].value,
         };
         this.onChange = this.onChange.bind(this);
     }
@@ -15,18 +18,18 @@ class DropdownField extends React.Component {
         if (this.props.onChange) {
             this.props.onChange(value);
         }
-        this.setState({selectedItem: value ? value.value : null});
+        this.setState({ selectedItem: value ? value.value : null });
     }
 
     componentWillReceiveProps(nextProps) {
-        this.setState({selectedItem: nextProps.selectedItem});
+        this.setState({ selectedItem: nextProps.selectedItem });
     }
 
     render() {
         return (
             <Field fieldName={this.props.fieldName} label={this.props.label} labelPosition={this.props.labelPosition}>
                 <Select
-                    className='dropdown'
+                    className="dropdown"
                     options={this.props.options}
                     name={this.props.name}
                     value={this.state.selectedItem}
@@ -34,9 +37,10 @@ class DropdownField extends React.Component {
                     searchable={this.props.searchable}
                     clearable={this.props.clearable}
                     placeholder={this.props.searchable ? 'Type to search...' : 'Select...'}
-                    multi={false}/>
+                    multi={false}
+                />
             </Field>
-        )
+        );
     }
 }
 
@@ -50,11 +54,11 @@ DropdownField.propTypes = {
     label: PropTypes.string,
     labelPosition: PropTypes.string,
     searchable: PropTypes.bool,
-}
+};
 
 DropdownField.defaultProps = {
     searchable: false,
     clearable: false,
-}
+};
 
 export default DropdownField;

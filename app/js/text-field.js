@@ -1,5 +1,5 @@
-import React, { PropTypes, Component } from 'react';
 import Field from './field';
+import React, { Component, PropTypes } from 'react';
 
 class TextField extends Component {
     constructor(props) {
@@ -11,12 +11,24 @@ class TextField extends Component {
 
     render() {
         return (
-            <Field fieldName={this.props.fieldName} label={this.props.label} labelPosition={this.props.labelPosition} helperText={this.props.helperText}>
-                <div className='field-text'>
-                    <input type='text' className='form-control' name={this.props.fieldName} value={this.props.value} onChange={this.onChange} />
-                    {this.props.buttonLabel ?
-                        <button className='btn btn-primary field-text--btn' onClick={this.onButtonClick}>{this.props.buttonLabel}</button>
-                    : null}
+            <Field
+                fieldName={this.props.fieldName}
+                label={this.props.label}
+                labelPosition={this.props.labelPosition}
+                helperText={this.props.helperText}>
+                <div className="field-text">
+                    <input
+                        type="text"
+                        className="form-control"
+                        name={this.props.fieldName}
+                        value={this.props.value}
+                        onChange={this.onChange}
+                    />
+                    {this.props.buttonLabel ? (
+                        <button className="btn btn-primary field-text--btn" onClick={this.onButtonClick}>
+                            {this.props.buttonLabel}
+                        </button>
+                    ) : null}
                 </div>
             </Field>
         );
@@ -45,10 +57,8 @@ TextField.propTypes = {
     buttonLabel: PropTypes.string,
     onChange: PropTypes.func,
     onButtonClick: PropTypes.func,
-}
+};
 
-TextField.defaultProps = {
+TextField.defaultProps = {};
 
-}
-
-export default TextField
+export default TextField;

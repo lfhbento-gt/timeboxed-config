@@ -7,15 +7,13 @@ const shouldShow = (version, minVersion, maxVersion) => {
 };
 
 const isNewer = (a, b) => {
-    let versionA = a.split('.').map(item => parseInt(item, 10));
-    let versionB = b.split('.').map(item => parseInt(item, 10));
-    return (versionA[0] > versionB[0]) || (versionA[0] === versionB[0] && versionA[1] >= versionB[1]);
+    let versionA = a.split('.').map((item) => parseInt(item, 10));
+    let versionB = b.split('.').map((item) => parseInt(item, 10));
+    return versionA[0] > versionB[0] || (versionA[0] === versionB[0] && versionA[1] >= versionB[1]);
 };
 
 const Versioned = (props) => {
-    return (shouldShow(props.version, props.minVersion, props.maxVersion) ?
-        <div>{props.children}</div>
-        : null);
+    return shouldShow(props.version, props.minVersion, props.maxVersion) ? <div>{props.children}</div> : null;
 };
 
 Versioned.propTypes = {
@@ -23,13 +21,10 @@ Versioned.propTypes = {
     version: PropTypes.string,
     minVersion: PropTypes.string,
     maxVersion: PropTypes.string,
+};
 
-}
+Versioned.defaultProps = {};
 
-Versioned.defaultProps = {
+export { shouldShow };
 
-}
-
-export { shouldShow }
-
-export default Versioned
+export default Versioned;

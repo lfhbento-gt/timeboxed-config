@@ -1,13 +1,13 @@
-import React from 'react';
 import FastClick from 'react-fastclick-alt';
 import Field from './field';
+import React, { PropTypes } from 'react';
 import Toggle from 'react-input-toggle/dist/react-input-toggle';
 import 'react-input-toggle/lib/styles/switch.scss';
 
 class ToggleField extends React.Component {
     constructor(props) {
         super(props);
-        this.state = {checked: !!props.checked};
+        this.state = { checked: !!props.checked };
         this.toggleCheckbox = this.toggleCheckbox.bind(this);
     }
 
@@ -15,22 +15,23 @@ class ToggleField extends React.Component {
         return (
             <Field label={this.props.label} fieldName={this.props.fieldName} longLabel={true}>
                 <label>
-                    <FastClick><Toggle effect='bbounce' onChange={this.toggleCheckbox} checked={this.state.checked}/></FastClick>
+                    <FastClick>
+                        <Toggle effect="bbounce" onChange={this.toggleCheckbox} checked={this.state.checked} />
+                    </FastClick>
                 </label>
             </Field>
-        )
+        );
     }
 
     componentWillReceiveProps(nextProps) {
         if (this.props.checked !== nextProps.checked) {
-            this.toggleCheckbox({target: {checked: !!nextProps.checked}});
+            this.toggleCheckbox({ target: { checked: !!nextProps.checked } });
         }
     }
 
-
     toggleCheckbox(e) {
         let value = !!e.target.checked;
-        this.setState({checked: value});
+        this.setState({ checked: value });
         if (this.props.onChange) {
             this.props.onChange(value);
         }
@@ -38,14 +39,14 @@ class ToggleField extends React.Component {
 }
 
 ToggleField.propTypes = {
-    checked: React.PropTypes.bool,
-    fieldName: React.PropTypes.string.isRequired,
-    label: React.PropTypes.string,
-    onChange: React.PropTypes.func,
-}
+    checked: PropTypes.bool,
+    fieldName: PropTypes.string.isRequired,
+    label: PropTypes.string,
+    onChange: PropTypes.func,
+};
 
 ToggleField.defaultProps = {
     checked: false,
-}
+};
 
-export default ToggleField
+export default ToggleField;

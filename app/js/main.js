@@ -1,64 +1,58 @@
-import objectAssign from 'object-assign';
+import { getReturnUrl } from './util/util';
 if (!Object.assign) {
     Object.prototype.assign = objectAssign;
 }
 
-import es6Promise from 'es6-promise';
+import Layout from './layout';
 es6Promise.polyfill();
 
 import React from 'react';
 import ReactDOM from 'react-dom';
-import Layout from './layout';
-import { getReturnUrl } from './util/util';
+import es6Promise from 'es6-promise';
+import objectAssign from 'object-assign';
 
 try {
+    const onSubmit = (data) => {
+        storeData(data);
+        document.location = getReturnUrl() + encodeURIComponent(JSON.stringify(formatDataToSend(data)));
+    };
 
-const onSubmit = (data) => {
-    storeData(data);
-    document.location = getReturnUrl() + encodeURIComponent(JSON.stringify(formatDataToSend(data)));
-};
+    const storeData = (data) => {
+        Object.keys(data).map((key) => {
+            localStorage[key] = data[key];
+        });
+    };
 
-const storeData = (data) => {
-    Object.keys(data).map(key => {
-        localStorage[key] = data[key];
-    });
-};
+    const getStoredData = () => {
+        return Object.keys(localStorage).reduce((data, key) => {
+            if (key === 'presets') {
+                return data;
+            }
 
-const getStoredData = () => {
-    return Object.keys(localStorage).reduce((data, key) => {
+            let value = localStorage[key] || '';
 
-        if (key === 'presets') {
-            return data;
-        }
+            value = value === 'true' || value === 'false' ? JSON.parse(value) : value;
+            value = typeof value === 'string' && value.indexOf('0x') !== -1 ? value.replace('0x', '#') : value;
 
-        let value = localStorage[key] || '';
+            return Object.assign(data, { [key]: value });
+        }, {});
+    };
 
-        value = value === 'true' || value === 'false' ? JSON.parse(value) : value;
-        value = typeof value === 'string' && value.indexOf('0x') !== -1 ? value.replace('0x', '#') : value;
+    const formatDataToSend = (data) => {
+        let newData = Object.keys(data).reduce((items, key) => {
+            items[key] = data[key];
 
-        return Object.assign(data, {[key]: value});
-    }, {});
-};
+            if (key.indexOf('Color') !== -1) {
+                items[key] = items[key].replace('#', '0x');
+            }
 
-const formatDataToSend = (data) => {
-    let newData = Object.keys(data).reduce((items, key) => {
-        items[key] = data[key];
+            return items;
+        }, {});
 
-        if (key.indexOf('Color') !== -1) {
-            items[key] = items[key].replace('#', '0x');
-        }
+        return newData;
+    };
 
-        return items;
-    }, {});
-
-    return newData;
-};
-
-ReactDOM.render(
-    <Layout onSubmit={onSubmit} state={getStoredData()} />,
-    document.getElementById('content')
-);
-
+    ReactDOM.render(<Layout onSubmit={onSubmit} state={getStoredData()} />, document.getElementById('content'));
 } catch (ex) {
     alert(ex.stack);
 }

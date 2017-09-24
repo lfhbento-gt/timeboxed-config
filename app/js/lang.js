@@ -1,5 +1,4 @@
-const lang = {
-};
+const lang = {};
 
 const locales = [
     'en_US',
@@ -27,7 +26,7 @@ const getText = (locale, text, params = {}) => {
 
 const replaceParams = (text, params) => {
     return Object.keys(params).reduce((str, key) => {
-        return str.replace('${' + key + '}', params[key]);
+        return str.replace(`\${${key}}`, params[key]);
     }, text);
 };
 

@@ -1,6 +1,6 @@
-import React, { PropTypes } from 'react';
+import { checkForUpdates, getCurrentVersion } from './util/util';
 import { getText } from './lang';
-import { getCurrentVersion, checkForUpdates } from './util/util';
+import React, { PropTypes } from 'react';
 
 class VersionIndicator extends React.Component {
     constructor(props, context) {
@@ -19,7 +19,7 @@ class VersionIndicator extends React.Component {
             if (hasUpdate) {
                 this.setState({
                     hasUpdate,
-                    latest: newVersion
+                    latest: newVersion,
                 });
             }
         });
@@ -33,25 +33,26 @@ class VersionIndicator extends React.Component {
 
     render() {
         return (
-            <span className='version' onClick={this.onClick}>{this.state.version ? `v${this.state.version}` : ' '}
-            {this.state.hasUpdate ?
-                <span className='update'>{getText(this.context.locale, '[v${version} available]', {version: this.state.latest})}</span>
-            : null}
+            <span className="version" onClick={this.onClick}>
+                {this.state.version ? `v${this.state.version}` : ' '}
+                {this.state.hasUpdate ? (
+                    <span className="update">
+                        {getText(this.context.locale, '[v${version} available]', { version: this.state.latest })}
+                    </span>
+                ) : null}
             </span>
         );
     }
 }
 
 VersionIndicator.propTypes = {
-    onClick: PropTypes.func
-}
+    onClick: PropTypes.func,
+};
 
-VersionIndicator.defaultProps = {
-
-}
+VersionIndicator.defaultProps = {};
 
 VersionIndicator.contextTypes = {
-    locale: PropTypes.string
-}
+    locale: PropTypes.string,
+};
 
-export default VersionIndicator
+export default VersionIndicator;

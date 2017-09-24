@@ -8,19 +8,14 @@ const HelperText = (props) => {
         'helper-text--field': !props.standalone,
         'helper-text--standalone': props.standalone,
     });
-    return (
-        <div className={classes} dangerouslySetInnerHTML={{__html: props.children}}>
-        </div>
-    );
+    return <div className={classes} dangerouslySetInnerHTML={{ __html: props.children }} />;
 };
 
 HelperText.propTypes = {
     standalone: PropTypes.bool,
     children: PropTypes.any,
-}
+};
 
-HelperText.defaultProps = {
+HelperText.defaultProps = {};
 
-}
-
-export default HelperText
+export default HelperText;

@@ -10,10 +10,12 @@ class Field extends React.Component {
             'field--long-reverse': this.props.labelPosition === 'bottom',
         });
         return (
-            <div className='field-container'>
+            <div className="field-container">
                 <div className={classes}>
-                    {this.props.label ? <label className='field-label'>{this.props.label}</label> : null}
-                    <div className='field-content'><div className='field-content-inner'>{this.props.children}</div></div>
+                    {this.props.label ? <label className="field-label">{this.props.label}</label> : null}
+                    <div className="field-content">
+                        <div className="field-content-inner">{this.props.children}</div>
+                    </div>
                 </div>
             </div>
         );
@@ -26,6 +28,6 @@ Field.propTypes = {
     longLabel: PropTypes.bool,
     labelPosition: PropTypes.string,
     children: PropTypes.any,
-}
+};
 
-export default Field
+export default Field;

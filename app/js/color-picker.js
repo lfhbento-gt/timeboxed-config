@@ -1,10 +1,8 @@
-import React, { PropTypes, Component } from 'react';
 import Field from './field';
+import React, { Component, PropTypes } from 'react';
 import Swatches from './swatches';
 
-
 class ColorPicker extends Component {
-
     constructor(props) {
         super(props);
         this.state = {
@@ -19,11 +17,10 @@ class ColorPicker extends Component {
         this.togglePanel = this.togglePanel.bind(this);
         this.toggleSecondPanel = this.toggleSecondPanel.bind(this);
         this.hidePanel = this.hidePanel.bind(this);
-
     }
 
     onColorChange(color) {
-        this.setState({color: color});
+        this.setState({ color: color });
         if (this.props.onChange) {
             this.props.onChange(color);
         }
@@ -31,7 +28,7 @@ class ColorPicker extends Component {
     }
 
     onSecondColorChange(color) {
-        this.setState({secondColor: color});
+        this.setState({ secondColor: color });
         if (this.props.onSecondColorChange) {
             this.props.onSecondColorChange(color);
         }
@@ -39,19 +36,19 @@ class ColorPicker extends Component {
     }
 
     showPanel() {
-        this.setState({panelVisible: true});
+        this.setState({ panelVisible: true });
     }
 
     hidePanel() {
-        this.setState({panelVisible: false, secondPanelVisible: false});
+        this.setState({ panelVisible: false, secondPanelVisible: false });
     }
 
     togglePanel() {
-        this.setState({panelVisible: !this.state.panelVisible});
+        this.setState({ panelVisible: !this.state.panelVisible });
     }
 
     toggleSecondPanel() {
-        this.setState({secondPanelVisible: !this.state.secondPanelVisible});
+        this.setState({ secondPanelVisible: !this.state.secondPanelVisible });
     }
 
     shouldComponentUpdate(nextProps, nextState) {
@@ -60,29 +57,31 @@ class ColorPicker extends Component {
 
     componentWillReceiveProps(nextProps) {
         if (this.state.color !== nextProps.color || this.state.secondColor !== nextProps.secondColor) {
-            this.setState({color: nextProps.color, secondColor: nextProps.secondColor});
+            this.setState({ color: nextProps.color, secondColor: nextProps.secondColor });
         }
     }
 
     render() {
         return (
-            <div className='color-picker'>
+            <div className="color-picker">
                 <Field fieldName={this.props.fieldName} label={this.props.label} longLabel={true}>
-                    <div className='swatch' onClick={this.togglePanel}>
-                        <div className='swatch--color' style={{backgroundColor: this.state.color}}></div>
+                    <div className="swatch" onClick={this.togglePanel}>
+                        <div className="swatch--color" style={{ backgroundColor: this.state.color }} />
                     </div>
-                    {this.state.secondColor ?
-                        <div className='swatch' onClick={this.toggleSecondPanel}>
-                            <div className='swatch--color' style={{backgroundColor: this.state.secondColor}}></div>
+                    {this.state.secondColor ? (
+                        <div className="swatch" onClick={this.toggleSecondPanel}>
+                            <div className="swatch--color" style={{ backgroundColor: this.state.secondColor }} />
                         </div>
-                    : null}
+                    ) : null}
                 </Field>
-                {this.state.panelVisible || this.state.secondPanelVisible ?
-                    <div className='color-panel'>
-                        <Swatches onColorChange={this.state.panelVisible ? this.onColorChange : this.onSecondColorChange} />
-                        <div className='color-panel--shim' onClick={this.hidePanel}></div>
+                {this.state.panelVisible || this.state.secondPanelVisible ? (
+                    <div className="color-panel">
+                        <Swatches
+                            onColorChange={this.state.panelVisible ? this.onColorChange : this.onSecondColorChange}
+                        />
+                        <div className="color-panel--shim" onClick={this.hidePanel} />
                     </div>
-                : null}
+                ) : null}
             </div>
         );
     }
@@ -95,10 +94,8 @@ ColorPicker.propTypes = {
     onSecondColorChange: PropTypes.func,
     fieldName: PropTypes.string,
     label: PropTypes.string,
-}
+};
 
-ColorPicker.defaultProps = {
+ColorPicker.defaultProps = {};
 
-}
-
-export default ColorPicker
+export default ColorPicker;
