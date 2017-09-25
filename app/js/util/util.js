@@ -10,7 +10,7 @@ const getPlatform = () => {
 };
 
 const getConfigs = () => {
-    return LZString.decompressFromEncodedURIComponent(getQueryParam('c'));
+    return LZString.decompressFromBase64(decodeURIComponent(getQueryParam('c')));
 };
 
 const getReturnUrl = () => {

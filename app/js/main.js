@@ -13,8 +13,7 @@ try {
         if (shouldShow(getCurrentVersion(), null, '4.4')) {
             storeData(data);
         }
-        document.location =
-            getReturnUrl() + LZString.compressToEncodedURIComponent(JSON.stringify(formatDataToSend(data)));
+        document.location = getReturnUrl() + LZString.compressToBase64(JSON.stringify(formatDataToSend(data)));
     };
 
     const storeData = (data) => {
@@ -25,10 +24,6 @@ try {
 
     const getStoredData = (source) => {
         return Object.keys(source).reduce((data, key) => {
-            if (key === 'presets') {
-                return data;
-            }
-
             let value = source[key] || '';
 
             value = value === 'true' || value === 'false' ? JSON.parse(value) : value;
@@ -48,7 +43,7 @@ try {
 
     const getConfigState = () => {
         let configs = getStoredDataFromParams();
-        if (Object.keys(configs) === 0) {
+        if (Object.keys(configs).length === 0) {
             configs = getStoredDataFromLocalStorage();
         }
 

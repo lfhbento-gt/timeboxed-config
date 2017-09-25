@@ -343,10 +343,9 @@ class ColorPresets extends Component {
             };
         }
 
-        let presets = { ...this.defaultPresets, ...this.getStoredPresets() };
-
         this.state = {
-            presets: presets,
+            presets: { ...this.defaultPresets, ...props.presets },
+            presetName: '',
         };
 
         this.onAddClick = this.onAddClick.bind(this);
@@ -356,38 +355,16 @@ class ColorPresets extends Component {
         this.storePresets();
     }
 
-    getStoredPresets() {
-        let presets = JSON.parse(window.localStorage.presets || '{}');
-        let oldPresets = this.getOldPresets();
-        return { ...oldPresets, ...presets };
-    }
-
-    getOldPresets() {
-        return Object.keys(localStorage).reduce((presets, key) => {
-            if (key.indexOf('preset-') === 0) {
-                let presetName = key.replace('preset-', '');
-                let newPreset = JSON.parse(localStorage[key]);
-                newPreset = Object.keys(newPreset).reduce((preset, key) => {
-                    let value = newPreset[key];
-
-                    value = value === 'true' || value === 'false' ? JSON.parse(value) : value;
-                    value = typeof value === 'string' && value.indexOf('0x') !== -1 ? value.replace('0x', '#') : value;
-
-                    preset[key] = value;
-
-                    return preset;
-                }, {});
-                presets[presetName] = newPreset;
-                delete localStorage[key];
-            }
-            return presets;
-        }, {});
+    componentWillReceiveProps(nextProps) {
+        this.setState({
+            presets: { ...this.defaultPresets, ...nextProps.presets },
+        });
     }
 
     storePresets() {
         let newPresets = { ...this.state.presets };
         Object.keys(this.defaultPresets).forEach((key) => delete newPresets[key]);
-        window.localStorage.presets = JSON.stringify(newPresets);
+        this.props.storePresets(newPresets);
     }
 
     onClick(preset, e) {
@@ -410,7 +387,7 @@ class ColorPresets extends Component {
             }
         }
         let presets = { ...this.state.presets, ...{ [name]: this.props.colors } };
-        this.setState({ presets: presets });
+        this.setState({ presets: presets, presetName: '' });
         window.setTimeout(this.storePresets, 0);
     }
 
@@ -423,6 +400,12 @@ class ColorPresets extends Component {
         }
         e.stopPropagation();
     }
+
+    onTextChange = (text) => {
+        this.setState({
+            presetName: text,
+        });
+    };
 
     render() {
         return (
@@ -448,8 +431,9 @@ class ColorPresets extends Component {
                 <TextField
                     fieldName="presetName"
                     buttonLabel={this._('Add New')}
-                    value=""
+                    value={this.state.presetName}
                     onButtonClick={this.onAddClick}
+                    onChange={this.onTextChange}
                 />
             </div>
         );
@@ -459,6 +443,8 @@ class ColorPresets extends Component {
 ColorPresets.propTypes = {
     onSelect: PropTypes.func,
     colors: PropTypes.object,
+    presets: PropTypes.object,
+    storePresets: PropTypes.func,
 };
 
 ColorPresets.defaultProps = {};

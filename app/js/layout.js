@@ -1,4 +1,5 @@
 /*eslint-disable no-console*/
+import { allTimezones } from './util/constants';
 import { fetchMasterKeyData, getCurrentVersion, getPlatform, verifyLocation } from './util/util';
 import { getLocaleById, getText } from './lang';
 import APIKey from './APIKey';
@@ -17,11 +18,11 @@ import ToggleField from './toggle';
 import VersionIndicator from './version-indicator';
 import Versioned, { shouldShow } from './versioned';
 
-// eslint-disable-next-line
+/* eslint-disable-next-line */
 import 'react-select/scss/default.scss';
-// eslint-disable-next-line
+/* eslint-disable-next-line */
 import 'bootstrap/scss/bootstrap-flex.scss';
-// eslint-disable-next-line
+/* eslint-disable-next-line */
 import '../css/main.scss';
 
 class Layout extends Component {
@@ -144,6 +145,7 @@ class Layout extends Component {
             this.defaultState = {
                 ...this.defaultState,
                 ...{
+                    weatherProvider: 2,
                     openWeatherKey: '',
                     presets: {},
                 },
@@ -162,13 +164,7 @@ class Layout extends Component {
         this.moduleWristStateKeys = ['wristSlotA', 'wristSlotB', 'wristSlotC', 'wristSlotD'];
 
         this.state = { ...this.defaultState, ...this.defaultColors, ...newState };
-        this.onPresetSelect = this.onPresetSelect.bind(this);
-        this.verifyLocation = this.verifyLocation.bind(this);
         this._ = getText.bind(this, getLocaleById(this.state.locale));
-        this.onSubmit = this.onSubmit.bind(this);
-        this.toggleDebug = this.toggleDebug.bind(this);
-        this.wipeConfigs = this.wipeConfigs.bind(this);
-        this.getMasterKeyData = this.getMasterKeyData.bind(this);
 
         this.modulesAll = [
             { value: '0', label: this._('None') },
@@ -193,118 +189,7 @@ class Layout extends Component {
             { value: '12', label: this._('Sunset') },
         ];
 
-        this.timezones = [
-            { value: '#|0:00', label: 'None' },
-            { value: 'aoe|-12:00', label: '(GMT -12) Int. Date Line' },
-            { value: 'sst|-11:00', label: '(GMT -11) SST: Samoa' },
-            { value: 'hast|-10:00', label: '(GMT -10) HAST: Hawaii' },
-            { value: 'hadt|-9:00', label: '(GMT -9) HADT: Hawaii (Daylight)' },
-            { value: 'akst|-9:00', label: '(GMT -9) AKST: Alaska' },
-            { value: 'akdt|-8:00', label: '(GMT -8) AKDT: Alaska (Daylight)' },
-            { value: 'pst|-8:00', label: '(GMT -8) PST: Pacific Standard Time' },
-            { value: 'pdt|-7:00', label: '(GMT -7) PDT: Pacific Daylight Time' },
-            { value: 'mst|-7:00', label: '(GMT -7) MST: Mountain Standard Time' },
-            { value: 'mdt|-6:00', label: '(GMT -6) MDT: Mountain Daylight Time' },
-            { value: 'cst|-6:00', label: '(GMT -6) CST: Central Standard Time' },
-            { value: 'cdt|-5:00', label: '(GMT -5) CDT: Central Daylight Time' },
-            { value: 'est|-5:00', label: '(GMT -5) EST: Eastern Standard Time' },
-            { value: 'pet|-5:00', label: '(GMT -5) PET: Peru' },
-            { value: 'act|-5:00', label: '(GMT -5) ACT: Acre, Brazil' },
-            { value: 'vet|-4:30', label: '(GMT -4:30) VET: Venezuela' },
-            { value: 'edt|-4:00', label: '(GMT -4) EDT: Eastern Daylight Time' },
-            { value: 'ast|-4:00', label: '(GMT -4) AST: Atlantic Standard Time' },
-            { value: 'nst|-3:30', label: '(GMT -3:30) NST: Newfoundland Time' },
-            { value: 'adt|-3:00', label: '(GMT -3) ADT: Atlantic Daylight Time' },
-            { value: 'art|-3:00', label: '(GMT -3) ART: Argentina' },
-            { value: 'brt|-3:00', label: '(GMT -3) BRT: Brazil' },
-            { value: 'wgt|-3:00', label: '(GMT -3) WGT: West Greenland' },
-            {
-                value: 'ndt|-2:30',
-                label: '(GMT -2:30) NST: Newfoundland Daylight Time',
-            },
-            {
-                value: 'wgst|-2:00',
-                label: '(GMT -2) WGST: West Greenland Summer Time',
-            },
-            { value: 'brst|-2:00', label: '(GMT -2) BRST: Brazil Summer Time' },
-            { value: 'egt|-1:00', label: '(GMT -1) EGT: East Greenland' },
-            { value: 'azot|-1:00', label: '(GMT -1) AZOT: Azores' },
-            { value: 'azost|0:00', label: '(GMT +0) AZOST: Azores Summer' },
-            { value: 'egst|0:00', label: '(GMT +0) EGST: East Greenland Summer' },
-            { value: 'gmt|0:00', label: 'GMT: Greenwich Mean Time' },
-            { value: 'wet|0:00', label: '(GMT +0) WET: Western European Time' },
-            { value: 'bst|1:00', label: '(GMT +1) BST: British Summer Time' },
-            { value: 'cet|1:00', label: '(GMT +1) CET: Central European Time' },
-            { value: 'ist|1:00', label: '(GMT +1) IST: Irish Standard Time' },
-            {
-                value: 'cest|2:00',
-                label: '(GMT +2) CEST: Central European Summer Time',
-            },
-            { value: 'cat|2:00', label: '(GMT +2) CAT: Central Africa Time' },
-            { value: 'eet|2:00', label: '(GMT +2) EET: Eastern European Time' },
-            {
-                value: 'sast|2:00',
-                label: '(GMT +2) SAST: South Africa Standard Time',
-            },
-            { value: 'eat|3:00', label: '(GMT +3) EAT: East Africa Time' },
-            {
-                value: 'eest|3:00',
-                label: '(GMT +3) EEST: Eastern European Summer Time',
-            },
-            { value: 'msk|3:00', label: '(GMT +3) MSK: Moscow Standard Time' },
-            { value: 'irst|3:30', label: '(GMT +3:30) IRST: Iran Standard Time' },
-            { value: 'gst|4:00', label: '(GMT +4) GST: Gulf Standard Time' },
-            { value: 'mdk|4:00', label: '(GMT +4) MDK: Moscow Daylight Time' },
-            { value: 'irdt|4:30', label: '(GMT +4:30) IRDT: Iran Daylight Time' },
-            { value: 'mvt|5:00', label: '(GMT +5) MVT: Maldives Time' },
-            { value: 'ist|5:30', label: '(GMT +5:30) IST: India Standard Time' },
-            { value: 'bst|6:00', label: '(GMT +6) BST: Bangladesh Standard Time' },
-            { value: 'mmt|6:30', label: '(GMT +6:30) MMT: Myanmar Time' },
-            { value: 'wib|7:00', label: '(GMT +7) WIB: Western Indonesian Time' },
-            { value: 'wita|8:00', label: '(GMT +8) WITA: Central Indonesian Time' },
-            {
-                value: 'awst|8:00',
-                label: '(GMT +8) AWST: Australia Western Standard Time',
-            },
-            { value: 'cst|8:00', label: '(GMT +8) CST: China Standard Time' },
-            { value: 'hkt|8:00', label: '(GMT +8) HKT: Hong Kong Time' },
-            { value: 'pyt|8:30', label: '(GMT +8:30) PYT: Pyongyang Time' },
-            { value: 'wit|9:00', label: '(GMT +9) WIT: Eastern Indonesian Time' },
-            {
-                value: 'awdt|9:00',
-                label: '(GMT +9) AWDT: Australia Western Daylight Time',
-            },
-            { value: 'jst|9:00', label: '(GMT +9) JST: Japan Standard Time' },
-            { value: 'kst|9:00', label: '(GMT +9) KST: Korea Standard Time' },
-            {
-                value: 'acst|9:30',
-                label: '(GMT +9:30) ACST: Australia Central Standard Time',
-            },
-            {
-                value: 'aest|10:00',
-                label: '(GMT +10) AEST: Australia Eastern Standard Time',
-            },
-            { value: 'pgt|10:00', label: '(GMT +10) PGT: Papua New Guinea Time' },
-            {
-                value: 'acdt|10:30',
-                label: '(GMT +10:30) ACDT: Australia Central Daylight Time',
-            },
-            {
-                value: 'aedt|11:00',
-                label: '(GMT +11) AEDT: Australia Eastern Daylight Time',
-            },
-            { value: 'fjt|12:00', label: '(GMT +12) FJT: Fiji Time' },
-            {
-                value: 'nzst|12:00',
-                label: '(GMT +12) NZST: New Zealand Standard Time',
-            },
-            { value: 'fjst|13:00', label: '(GMT +13) FJST: Fiji Summer Time' },
-            {
-                value: 'nzdt|13:00',
-                label: '(GMT +13) NZDT: New Zealand Daylight Time',
-            },
-            { value: 'wst|14:00', label: '(GMT +14) WST: Western Samoa Time' },
-        ];
+        this.timezones = allTimezones;
 
         this.locales = [
             { value: '0', label: this._('English') },
@@ -402,7 +287,7 @@ class Layout extends Component {
         this.modules = this.platform === 'aplite' ? this.modulesAplite : this.modulesAll;
     }
 
-    filterValidKeys(data, keys, invert = false) {
+    filterValidKeys = (data, keys, invert = false) => {
         let newData = { ...data };
         Object.keys(newData).map((key) => {
             if ((!invert && keys.indexOf(key) === -1) || (invert && keys.indexOf(key) !== -1)) {
@@ -410,9 +295,9 @@ class Layout extends Component {
             }
         });
         return newData;
-    }
+    };
 
-    wipeConfigs() {
+    wipeConfigs = () => {
         if (
             window.confirm(
                 'This will clean all the config data for Timeboxed saved on your phone. ' +
@@ -423,32 +308,73 @@ class Layout extends Component {
             window.localStorage.clear();
             this.setState({ ...this.defaultState, ...this.defaultColors });
         }
-    }
+    };
+
+    getStoredPresets = () => {
+        let presets = this.state.presets || {};
+        presets =
+            Object.keys(presets).length > 0
+                ? presets
+                : { ...JSON.parse(window.localStorage.presets || '{}'), ...this.getOldPresets() };
+        return presets;
+    };
+
+    getOldPresets = () => {
+        return Object.keys(localStorage).reduce((presets, key) => {
+            if (key.indexOf('preset-') === 0) {
+                let presetName = key.replace('preset-', '');
+                let newPreset = JSON.parse(localStorage[key]);
+                newPreset = Object.keys(newPreset).reduce((preset, key) => {
+                    let value = newPreset[key];
+
+                    value = value === 'true' || value === 'false' ? JSON.parse(value) : value;
+                    value = typeof value === 'string' && value.indexOf('0x') !== -1 ? value.replace('0x', '#') : value;
+
+                    preset[key] = value;
+
+                    return preset;
+                }, {});
+                presets[presetName] = newPreset;
+                delete localStorage[key];
+            }
+            return presets;
+        }, {});
+    };
+
+    storePresets = (newPresets) => {
+        if (shouldShow(getCurrentVersion(), null, '4.4')) {
+            window.localStorage.presets = JSON.stringify(newPresets);
+        } else {
+            this.setState({
+                presets: newPresets,
+            });
+        }
+    };
 
     getChildContext() {
         return { locale: getLocaleById(this.state.locale) };
     }
 
-    onChange(key, value) {
+    onChange = (key, value) => {
         console.log({ [key]: value });
         this.setState({ [key]: value });
-    }
+    };
 
-    onChangeDropdown(key, value) {
+    onChangeDropdown = (key, value) => {
         let newValue = value ? value.value : null;
         this.onChange(key, newValue);
-    }
+    };
 
-    onPresetSelect(colors) {
+    onPresetSelect = (colors) => {
         this.setState(colors);
-    }
+    };
 
-    toggleDebug() {
+    toggleDebug = () => {
         let showDebug = this.state.showDebug;
         this.setState({ showDebug: !showDebug });
-    }
+    };
 
-    onSubmit() {
+    onSubmit = () => {
         if (
             (this.weatherProviderSelected('0') && !this.state.openWeatherKey) ||
             (this.weatherProviderSelected('1') && !this.state.weatherKey) ||
@@ -471,24 +397,24 @@ class Layout extends Component {
         if (this.props.onSubmit) {
             this.props.onSubmit({ ...this.filterValidKeys(this.state, this.ignoreKeys, true) });
         }
-    }
+    };
 
-    getCurrentColors() {
+    getCurrentColors = () => {
         return this.colorKeys.reduce(
             (colors, colorKey) => ({ ...colors, ...{ [colorKey]: this.state[colorKey] } }),
             {}
         );
-    }
+    };
 
-    isWeatherEnabled() {
+    isWeatherEnabled = () => {
         return this.isEnabled(this.weatherModules);
-    }
+    };
 
-    isHealthEnabled() {
+    isHealthEnabled = () => {
         return this.isEnabled(this.healthModules) || this.state.showSleep;
-    }
+    };
 
-    isEnabled(moduleIndexes) {
+    isEnabled = (moduleIndexes) => {
         return (
             this.moduleStateKeys.some((key) => moduleIndexes.indexOf(this.state[key]) !== -1) ||
             (this.state.showSleep &&
@@ -498,31 +424,31 @@ class Layout extends Component {
             (this.state.showWrist &&
                 this.moduleWristStateKeys.some((key) => moduleIndexes.indexOf(this.state[key]) !== -1))
         );
-    }
+    };
 
-    isEnabledTapWrist(moduleIndexes) {
+    isEnabledTapWrist = (moduleIndexes) => {
         return (
             (this.state.showTap &&
                 this.moduleTapStateKeys.some((key) => moduleIndexes.indexOf(this.state[key]) !== -1)) ||
             (this.state.showWrist &&
                 this.moduleWristStateKeys.some((key) => moduleIndexes.indexOf(this.state[key]) !== -1))
         );
-    }
+    };
 
-    weatherProviderSelected(index) {
+    weatherProviderSelected = (index) => {
         return [index].indexOf(this.state.weatherProvider) !== -1;
-    }
+    };
 
-    componentWillUpdate() {
+    componentWillUpdate = () => {
         this._ = getText.bind(this, getLocaleById(this.state.locale));
-    }
+    };
 
-    verifyLocation(loc) {
+    verifyLocation = (loc) => {
         console.log(loc);
         verifyLocation(loc, this.state.weatherProvider, this.state.weatherKey);
-    }
+    };
 
-    getMasterKeyData() {
+    getMasterKeyData = () => {
         console.log(`Fetching data for ${this.state.masterKeyEmail}`);
         fetchMasterKeyData(this.state.masterKeyEmail, this.state.masterKeyPin, (keys) => {
             console.log(`WU: ${keys.wu} / DarkSky ${keys.forecast}`);
@@ -532,9 +458,9 @@ class Layout extends Component {
                 forecastKey: keys.forecast || '',
             });
         });
-    }
+    };
 
-    getModules(options) {
+    getModules = (options) => {
         return (
             <div>
                 {options.map((item) => {
@@ -580,9 +506,9 @@ class Layout extends Component {
                 })}
             </div>
         );
-    }
+    };
 
-    getEnabledModules() {
+    getEnabledModules = () => {
         let state = this.state;
 
         let modules = {
@@ -806,9 +732,9 @@ class Layout extends Component {
         }
 
         return modules;
-    }
+    };
 
-    getModulesRound(options) {
+    getModulesRound = (options) => {
         return (
             <div>
                 {options.map((item) => {
@@ -828,9 +754,9 @@ class Layout extends Component {
                 })}
             </div>
         );
-    }
+    };
 
-    getEnabledModulesRound() {
+    getEnabledModulesRound = () => {
         let state = this.state;
 
         let modules = {
@@ -1038,7 +964,7 @@ class Layout extends Component {
         }
 
         return modules;
-    }
+    };
 
     render() {
         let state = this.state;
@@ -1494,7 +1420,12 @@ class Layout extends Component {
 
                 {state.enableAdvanced && (
                     <OptionGroup title={this._('Color Presets')}>
-                        <ColorPresets colors={this.getCurrentColors()} onSelect={this.onPresetSelect} />
+                        <ColorPresets
+                            colors={this.getCurrentColors()}
+                            onSelect={this.onPresetSelect}
+                            storePresets={this.storePresets}
+                            presets={state.presets}
+                        />
                     </OptionGroup>
                 )}
 

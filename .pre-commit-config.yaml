@@ -22,4 +22,5 @@ repos:
 - repo: git://github.com/lfhbento/mirrors-prettier-eslint-cli
   sha: v4.1.1
   hooks:
-  -   id: prettier-eslint
+  - id: prettier-eslint
+    exclude: '(app\/js\/util\/lz-string.js)'
