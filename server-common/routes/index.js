@@ -13,4 +13,8 @@ router.get('/pebble-apps/timeboxed/config/', function(req, res) {
     res.render('index', { title: 'Timeboxed', scriptSrc: scriptSrc });
 });
 
+router.get('/healthcheck', function(req, res) {
+    res.status(200).send();
+});
+
 module.exports = router;

@@ -1,20 +1,20 @@
-import { getReturnUrl } from './util/util';
-if (!Object.assign) {
-    Object.prototype.assign = objectAssign;
-}
-
+import { getConfigs, getCurrentVersion, getReturnUrl } from './util/util';
+import { shouldShow } from './versioned';
+import LZString from './util/lz-string';
 import Layout from './layout';
-es6Promise.polyfill();
-
 import React from 'react';
 import ReactDOM from 'react-dom';
 import es6Promise from 'es6-promise';
-import objectAssign from 'object-assign';
+
+es6Promise.polyfill();
 
 try {
     const onSubmit = (data) => {
-        storeData(data);
-        document.location = getReturnUrl() + encodeURIComponent(JSON.stringify(formatDataToSend(data)));
+        if (shouldShow(getCurrentVersion(), null, '4.4')) {
+            storeData(data);
+        }
+        document.location =
+            getReturnUrl() + LZString.compressToEncodedURIComponent(JSON.stringify(formatDataToSend(data)));
     };
 
     const storeData = (data) => {
@@ -23,19 +23,36 @@ try {
         });
     };
 
-    const getStoredData = () => {
-        return Object.keys(localStorage).reduce((data, key) => {
+    const getStoredData = (source) => {
+        return Object.keys(source).reduce((data, key) => {
             if (key === 'presets') {
                 return data;
             }
 
-            let value = localStorage[key] || '';
+            let value = source[key] || '';
 
             value = value === 'true' || value === 'false' ? JSON.parse(value) : value;
             value = typeof value === 'string' && value.indexOf('0x') !== -1 ? value.replace('0x', '#') : value;
 
             return Object.assign(data, { [key]: value });
         }, {});
+    };
+
+    const getStoredDataFromLocalStorage = () => getStoredData(localStorage);
+
+    const getStoredDataFromParams = () => {
+        let config = getConfigs();
+        config = config ? JSON.parse(config) : {};
+        return getStoredData(config);
+    };
+
+    const getConfigState = () => {
+        let configs = getStoredDataFromParams();
+        if (Object.keys(configs) === 0) {
+            configs = getStoredDataFromLocalStorage();
+        }
+
+        return configs;
     };
 
     const formatDataToSend = (data) => {
@@ -52,7 +69,7 @@ try {
         return newData;
     };
 
-    ReactDOM.render(<Layout onSubmit={onSubmit} state={getStoredData()} />, document.getElementById('content'));
+    ReactDOM.render(<Layout onSubmit={onSubmit} state={getConfigState()} />, document.getElementById('content'));
 } catch (ex) {
     alert(ex.stack);
 }

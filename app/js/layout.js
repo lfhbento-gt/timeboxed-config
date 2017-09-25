@@ -1,6 +1,7 @@
 /*eslint-disable no-console*/
 import { fetchMasterKeyData, getCurrentVersion, getPlatform, verifyLocation } from './util/util';
 import { getLocaleById, getText } from './lang';
+import APIKey from './APIKey';
 import ColorPicker from './color-picker';
 import ColorPresets from './color-presets';
 import DonateButton from './donate';
@@ -135,6 +136,16 @@ class Layout extends Component {
                     heartColorOff: '#FFFFFF',
                     compassColor: '#FFFFFF',
                     secondsColor: '#FFFFFF',
+                },
+            };
+        }
+
+        if (shouldShow(this.currentVersion, '4.5', null)) {
+            this.defaultState = {
+                ...this.defaultState,
+                ...{
+                    openWeatherKey: '',
+                    presets: {},
                 },
             };
         }
@@ -439,6 +450,7 @@ class Layout extends Component {
 
     onSubmit() {
         if (
+            (this.weatherProviderSelected('0') && !this.state.openWeatherKey) ||
             (this.weatherProviderSelected('1') && !this.state.weatherKey) ||
             (this.weatherProviderSelected('3') && !this.state.forecastKey)
         ) {
@@ -1501,35 +1513,37 @@ class Layout extends Component {
                             onChange={this.onChangeDropdown.bind(this, 'weatherProvider')}
                         />
 
-                        {this.weatherProviderSelected('1') && (
-                            <div>
-                                <TextField
-                                    fieldName="weatherKey"
-                                    label={this._('API Key')}
-                                    value={state.weatherKey}
-                                    onChange={this.onChange.bind(this, 'weatherKey')}
-                                />
-                                <HelperText>
-                                    {this._(
-                                        '<strong>Note:</strong> For WeatherUnderground, you need an API key. Go to <a href="http://www.wunderground.com/weather/api/?apiref=73d2b41a1a02e3bd">wunderground.com</a> to create a free account and get a key and insert it above.'
+                        {this.weatherProviderSelected('0') && (
+                            <Versioned minVersion="4.5" version={this.currentVersion}>
+                                <APIKey
+                                    keyName="openWeatherKey"
+                                    value={state.openWeatherKey}
+                                    onChange={this.onChange.bind(this, 'openWeatherKey')}
+                                    helperText={this._(
+                                        '<strong>Note:</strong> Unfortunately, the API key previously used by Timeboxed couldn\'t handle all the users, so from now you need your own API key. Go to <a href="https://home.openweathermap.org/users/sign_up">home.openweathermap.org/users/sign_up</a> to create a free account and get a key and insert it above.'
                                     )}
-                                </HelperText>
-                            </div>
+                                />
+                            </Versioned>
+                        )}
+                        {this.weatherProviderSelected('1') && (
+                            <APIKey
+                                keyName="weatherKey"
+                                value={state.weatherKey}
+                                onChange={this.onChange.bind(this, 'weatherKey')}
+                                helperText={this._(
+                                    '<strong>Note:</strong> For WeatherUnderground, you need an API key. Go to <a href="http://www.wunderground.com/weather/api/?apiref=73d2b41a1a02e3bd">wunderground.com</a> to create a free account and get a key and insert it above.'
+                                )}
+                            />
                         )}
                         {this.weatherProviderSelected('3') && (
-                            <div>
-                                <TextField
-                                    fieldName="forecastKey"
-                                    label={this._('API Key')}
-                                    value={state.forecastKey}
-                                    onChange={this.onChange.bind(this, 'forecastKey')}
-                                />
-                                <HelperText>
-                                    {this._(
-                                        '<strong>Note:</strong> For Dark Sky/Forecast.io, you need an API key. Go to <a href="https://darksky.net/dev/">darksky.net/dev/</a> to create a free account and get a key and insert it above.'
-                                    )}
-                                </HelperText>
-                            </div>
+                            <APIKey
+                                keyName="forecastKey"
+                                value={state.forecastKey}
+                                onChange={this.onChange.bind(this, 'forecastKey')}
+                                helperText={this._(
+                                    '<strong>Note:</strong> For Dark Sky/Forecast.io, you need an API key. Go to <a href="https://darksky.net/dev/">darksky.net/dev/</a> to create a free account and get a key and insert it above.'
+                                )}
+                            />
                         )}
 
                         {this.isEnabled(['1', '2']) && (

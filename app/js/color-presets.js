@@ -386,7 +386,7 @@ class ColorPresets extends Component {
 
     storePresets() {
         let newPresets = { ...this.state.presets };
-        Object.keys(this.defaultPresets).map((key) => delete newPresets[key]);
+        Object.keys(this.defaultPresets).forEach((key) => delete newPresets[key]);
         window.localStorage.presets = JSON.stringify(newPresets);
     }
 
